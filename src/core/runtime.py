@@ -7,9 +7,9 @@ import src.core.errlog as errlog
 # Primary entry point for runtime.
 def run(project):
     config,nonce = params.get_parameters(project)
-    data,nonce = acquire_data(config,nonce)
-    data = reshape_data(config,data)
-    export_data(data,project,config)
+    data,nonce = acquire_data(project,config,nonce)
+    data = reshape_data(project,config,data)
+    export_data(project,config,data)
     params.update_nonce(project,nonce)
 
 # Acquire the data via specifid method.
@@ -36,7 +36,7 @@ def reshape_data(project,config,data):
     return data
 
 # Save data via specified channels.
-def export_data(data,project,config):
+def export_data(project,config,data):
     if not data:
         print('no values to export.')
         return

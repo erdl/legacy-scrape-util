@@ -6,7 +6,7 @@ import time
 
 # Primary entry point for webctrl scrape.
 # Returns data & nonce_new
-def scrape(config,nonce={}):
+def scrape(project,config,nonce):
     nonce = check_nonce(nonce,config['nodes'])
     nonce_new = {k:nonce[k] for k in nonce}
     data = []
