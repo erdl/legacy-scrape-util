@@ -20,7 +20,7 @@ def acquire_data(config,nonce):
     return data,nonce
 
 # Reshape data via specified mappings.
-def reshape_data(config,data):
+def reshape_data(project,config,data):
     if 'reshape' in config:
         rconf = config['reshape']
     else: return data
@@ -32,7 +32,7 @@ def reshape_data(config,data):
     skey = lambda k: rutils[k].ORD
     rord = sorted(rord,key=skey)
     for rs in rord:
-        data = rutils[rs].reshape(data)
+        data = rutils[rs].reshape(project,rconf[rs],data)
     return data
 
 # Save data via specified channels.
