@@ -21,7 +21,7 @@ def check_project(project):
 def get_config(project):
     fname = 'config.json'
     config = get_projfile(project,fname)
-    if not conifg:
+    if not config:
         raise Exception('no config found for {}'.format(project))
     config = expand_config(project,config)
     return config
@@ -39,6 +39,8 @@ def get_nonce(project):
 # Returns `None` if no such file exists.
 def get_projfile(project,fname):
     fpath = 'tmp/projects/{}/{}'.format(project,fname)
+    if not '.json' in fpath:
+        fpath += '.json'
     if path.isfile(fpath):
         with open(fpath) as fp:
             data = json.load(fp)
@@ -47,19 +49,23 @@ def get_projfile(project,fname):
 
 # Expand any `-file` keys in config
 def expand_config(project,config):
+    new = {}
     for c in config:
         cfield = config[c]
+        new[c] = {}
         for k in cfield:
             if not '-file' in k: continue
             n = k.split('-').pop(0)
             d = get_projfile(project,cfield[k])
-            if d: config[n] = d
+            if d: new[c][n] = d
             else: raise Exception('no file named {}'.format(cfield[k]))
+    for f in new:
+        config[f].update(new[f])
     return config
 
 # Update the nonce.
 def update_nonce(project,nonce):
-    check_proj(project)
+    check_project(project)
     fpath = 'tmp/projects/{}/nonce.json'.format(project)
     with open(fpath,'w') as fp:
         json.dump(nonce,fp)

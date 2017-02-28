@@ -9,12 +9,12 @@ def run(project):
     config,nonce = params.get_parameters(project)
     data,nonce = acquire_data(config,nonce)
     data = reshape_data(config,data)
-    export_data(data)
-    params.update_nonce(nonce)
+    export_data(data,project,config)
+    params.update_nonce(project,nonce)
 
 # Acquire the data via specifid method.
 def acquire_data(config,nonce):
-    daconf = config['data-acquisition']
+    daconf = config['acquire']
     scraper = get_util('acquire',daconf['type'])
     data,nonce = scraper.scrape(daconf,nonce)
     return data,nonce
@@ -36,12 +36,14 @@ def reshape_data(config,data):
     return data
 
 # Save data via specified channels.
-def export_data(config,data):
-    expconf = config['export']
-    for kind in expconf:
-        exputil = get_util('export',kind)
-        exputil.export(data,expconf[kind])
-
+def export_data(data,project,config):
+    if not data:
+        print('no values to export.')
+        return
+    exconf = config['export']
+    for kind in exconf:
+        exutil = get_util('export',kind)
+        exutil.export(data,project,exconf[kind])
 
 # Generate the scraper from 'type' field.
 def get_util(category,kind):

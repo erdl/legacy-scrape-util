@@ -1,0 +1,11 @@
+{
+  "acquire" : {
+    "type" : "webctrl",
+    "nodes-file" : "sensors",
+    "server-file" : "server"
+  },
+  "reshape" : {},
+  "export"  : {
+    "csv" : {}
+  }
+}

@@ -3,6 +3,7 @@ from src.core.row import Row
 import requests
 import time
 
+
 # Primary entry point for webctrl scrape.
 # Returns data & nonce_new
 def scrape(config,nonce={}):
@@ -15,11 +16,11 @@ def scrape(config,nonce={}):
         for sn in sensors:
             nn = nonce[sn]
             qs = sensors[sn]['query-string']
-            rslt = query(q,n)
-            if not rslt: continue
+            rslt = query(qs,nn)
             unit = sensors[sn]['unit']
             lrow = lambda t,v : Row(node,sn,unit,float(t//1000),float(v))
             rows = [lrow(r['t'],r['a']) for r in rslt if not '?' in r.values()]
+            if not rows: continue
             fltr = lambda r: r.timestamp
             nonce_new[sn] = max(rows,key=fltr).timestamp
             data += rows

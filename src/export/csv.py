@@ -6,7 +6,7 @@ import csv
 import os
 
 # Main save-to-csv entry point.
-def save(data,project,csv_config,ftxt='raw'):
+def export(data,project,config,ftxt='raw'):
     # TODO: use csv config values for something...
     # probably for choosing file txt, etc...
     save_csv(data,project,ftxt)
