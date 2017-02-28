@@ -23,7 +23,8 @@ def scrape(config,nonce={}):
             fltr = lambda r: r.timestamp
             nonce_new[sn] = max(rows,key=fltr).timestamp
             data += rows
-    return data,nonce_new
+    if data: nonce = nonce_new
+    return data,nonce
 
 # Add a new nonce field for any sensors
 # not found in the nonce.
@@ -55,20 +56,3 @@ def exec_query(uri,sensor,auth,start,stop):
         print(req.text)
         raise Exception("Query Failed w/ Status Code {}".format(req.status_code))
     return req.json()[0]['s']
-
-
-# Example Config:
-# {
-# 'nodes' : {
-#   'nodename' : {
-#     'sensorname' : {
-#       'query-string' : 'somestring',
-#       'unit' : 'someunit'
-#     }
-#   }
-# }
-# 'server' : {
-#   'uri' : 'someuri',
-#   'auth' : ['uname','pass']
-# }
-# }
