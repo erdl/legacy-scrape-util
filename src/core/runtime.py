@@ -5,6 +5,8 @@ import src.core.errlog as errlog
 
 
 # Primary entry point for runtime.
+# The one constant point in a world
+# that is rife with uncertainty.
 def run(project):
     config,nonce = params.get_parameters(project)
     data,nonce = acquire_data(project,config,nonce)
@@ -13,13 +15,14 @@ def run(project):
     params.update_nonce(project,nonce)
 
 # Acquire the data via specifid method.
-def acquire_data(config,nonce):
-    daconf = config['acquire']
-    scraper = get_util('acquire',daconf['type'])
-    data,nonce = scraper.scrape(daconf,nonce)
+# Returns data and a new set of nonce values.
+def acquire_data(project,config,nonce):
+    dconf = config['acquire']
+    scraper = get_util('acquire',dconf['type'])
+    data,nonce = scraper.scrape(project,dconf,nonce)
     return data,nonce
 
-# Reshape data via specified mappings.
+# Reshape the data via specified mapping(s).
 def reshape_data(project,config,data):
     if 'reshape' in config:
         rconf = config['reshape']
@@ -35,7 +38,7 @@ def reshape_data(project,config,data):
         data = rutils[rs].reshape(project,rconf[rs],data)
     return data
 
-# Save data via specified channels.
+# Save the data via specified channel(s).
 def export_data(project,config,data):
     if not data:
         print('no values to export.')
@@ -45,9 +48,11 @@ def export_data(project,config,data):
         exutil = get_util('export',kind)
         exutil.export(data,project,exconf[kind])
 
-# Generate the scraper from 'type' field.
+# Generic 'utility' getter.
+# Attempts to take a category & kind,
+# and return a library object.
 def get_util(category,kind):
-    modname = 'src.{}.{}'.format(category,kind)
+    modname = 'src.{}.{}'.format(category,kind).lower()
     try: mod = import_module(modname)
     except: raise Exception('no utility at: {}'.format(modname))
     return mod
