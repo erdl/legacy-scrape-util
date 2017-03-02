@@ -17,7 +17,7 @@ def export(data,project,config):
 # Save it to a thing!
 def save_csv(project,data,txt='raw'):
     projdir = dirset(project)
-    fname = fset(ftxt)
+    fname = fset(txt)
     fpath = projdir + fname
     fields = data[0]._fields
     print('writing {} rows to {}'.format(len(data),fpath))
@@ -34,7 +34,7 @@ def dirset(project):
     return projdir
 
 # set up & return file name.
-def fset(ftxt):
+def fset(txt):
     ft = str(int(time.time()))
-    fname = '{}-{}.csv'.format(ftxt,ft)
+    fname = '{}-{}.csv'.format(txt,ft)
     return fname
