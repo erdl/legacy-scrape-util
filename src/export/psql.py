@@ -27,7 +27,7 @@ def exec_push(data,cmd,db):
                     cur.execute(cmd,row)
                 con.commit()
             except Exception as err:
-                if err == psql.IntegrityError:
+                if 'duplicate key' in err:
                     con.rollback()
                 else:
                     errs.append(row)
