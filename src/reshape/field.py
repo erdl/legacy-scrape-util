@@ -12,6 +12,7 @@ def reshape(project,config,data):
 
 # Map one or more fields to some other set of fields.
 def map_fields(data,fieldmap):
+    if not data: return []
     fieldmap = { k.lower() : fieldmap[k] for k in fieldmap }
     dfields  = data[0]._fields
     indexmap = []

@@ -1,38 +1,73 @@
 #!/usr/bin/env python3
 from src.core.errlog import errdata
+from src.core.row import Row
 
+# Determines order of application
+# during mulit-phase reshaping process.
 ORD = 0
 
 # reshape : proj -> conf -> data -> data
 def reshape(project,config,data):
-    data,err = map_content(data,config)
+    data,err = exec_mapping(data,config)
     if err: errdata(project,err)
     return data
 
-# Map a set of values to some other set of values.
-def map_content(data,valmap):
-    valmap = { k.lower() : valmap[k] for k in valmap }
-    dfields = data[0]._fields
-    maperr = []
-    mapped = []
-    for field in valmap:
-        if field not in dfields:
-            raise Exception('invalid mapping: {}'.format(field))
-        index = dfields.index(field)
-        if 'ignore' in valmap[field]:
-            ignore = [i.lower() for i in valmap[field]['ignore']]
-        else: ignore = []
-        fmap = valmap[field]['map']
-        fmap = { k.lower() : fmap[k] for k in fmap }
-        for d in data:
-            r = [f for f in d]
-            val = r[index]
-            if val in fmap:
-                r[index] = fmap[val]
-                mapped.append(Row(*r))
-            else:
-                if val in ignore: continue
-                else: maperr.append(Row(*r))
-        data = [ r for r in mapped ]
-        mapped = []
-    return data,maperr
+# Iteratively launch the appropriate
+# mapping function for each specified field.
+def exec_mapping(data,config):
+    errors = []
+    for field in config:
+        if not data: break
+        if 'sub-map' in config[field]:
+            vals,errs = sub_map(data,field,config[field])
+        else:
+            vals,errs = map_field(data,field,config[field])
+        errors += errs
+        data = vals
+    return data,errors
+
+# Recursively generate mapping with
+# multiple field dependencies.
+def sub_map(data,field,fmap):
+    if not data: return [],[]
+    fmt = lambda v: str(v).lower()
+    mapped,maperr = [],[]
+    subfield = fmt(fmap['sub-map'])
+    index = data[0]._fields.index(subfield)
+    if 'ignore' in fmap:
+        ignore = [fmt(i) for i in fmap['ignore']]
+    else: ignore = []
+    ignrows = [ r for r in data if fmt(r[index]) in ignore ]
+    vmap = fmap['map']
+    vmap = { fmt(k) : vmap[k] for k in vmap }
+    for val in vmap:
+        rows = [ r for r in data if fmt(r[index]) == val ]
+        if not rows: continue
+        if 'sub-map' in vmap[val]:
+            mrows,erows = sub_map(rows,field,vmap[val])
+        else:
+            mrows,erows = map_field(rows,field,vmap[val])
+        mapped += mrows
+        maperr += erows 
+        data = [ r for r in data if not r in rows ]
+    maperr += data
+    return mapped,maperr
+
+# Map new values to a given field.
+def map_field(data,field,fmap):
+    mapped,maperr = [],[]
+    index = data[0]._fields.index(field)
+    if 'ignore' in fmap:
+        ignore = [i.lower() for i in fmap['ignore']]
+    else: ignore = []
+    vmap = fmap['map']
+    vmap = { k.lower() : vmap[k] for k in vmap }
+    for r in data:
+        l = list(r)
+        v = l[index]
+        if v in vmap:
+            l[index] = vmap[v]
+            mapped.append(Row(*l))
+        elif v in ignore: continue
+        else: maperr.append(Row(*l))
+    return mapped,maperr

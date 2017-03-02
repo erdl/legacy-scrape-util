@@ -32,6 +32,7 @@ def reshape_data(project,config,data):
     rord = []
     for kind in rconf:
         if 'file' in kind: continue
+        if not isactive(rconf[kind]): continue
         rutils[kind] = get_util('reshape',kind)
         rord.append(kind)
     skey = lambda k: rutils[k].ORD
@@ -47,6 +48,8 @@ def export_data(project,config,data):
         return
     exconf = config['export']
     for kind in exconf:
+        if 'file' in kind: continue
+        if not isactive(exconf[kind]): continue
         exutil = get_util('export',kind)
         exutil.export(data,project,exconf[kind])
 
@@ -58,3 +61,12 @@ def get_util(category,kind):
     try: mod = import_module(modname)
     except: raise Exception('no utility at: {}'.format(modname))
     return mod
+
+# Check a dictionary for the 'is-active'
+# flag, returning true unless 'is-active'
+# exists and is set to false.
+def isactive(subject):
+    if 'is-active' in subject:
+        if not subject['is-active']:
+            return False
+    return True

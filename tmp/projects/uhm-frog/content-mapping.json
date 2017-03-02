@@ -1,0 +1,25 @@
+{
+  "sensor" : {
+    "sub-map" : "node",
+    "map" : {
+      "frog-1" : {
+        "map" : {
+          "light" : 1
+        }
+      },
+      "frog-2" : {
+        "sub-map" : "unit",
+        "map" : {
+          "lux" : {
+            "map" : {
+              "light" : 2
+            }
+          }
+        }
+      }
+    },
+    "ignore" : [
+      "weather-station"
+    ]
+  }
+}

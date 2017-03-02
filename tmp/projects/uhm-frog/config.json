@@ -5,11 +5,15 @@
     "server-file" : "server"
   },
   "reshape" : {
-    "field-file" : "field-mapping"
+    "field-file" : "field-mapping",
+    "content-file" : "content-mapping"
   },
   "export"  : {
-    "csv" : {},
+    "csv" : {
+      "is-active" : true
+    },
     "psql" : {
+      "is-active" : false,
       "database"  : "frog_uhm",
       "table"     : "webctrl_bulk_trend_test_two",
       "custom-insertion" : {
