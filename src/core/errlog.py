@@ -10,7 +10,7 @@ def mklog(project,text):
     proj = 'project............{}'.format(project)
     ftr  = '...................endlog\n'
     errdir = dirset(project)
-    fpath  = dirset + 'errlog.txt'
+    fpath  = errdir + 'errlog.txt'
     with open(fpath,'a') as fp:
         write = lambda txt: print(txt,file=fp)
         write(hdr)
