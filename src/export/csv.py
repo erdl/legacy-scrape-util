@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.errlog import errdata
+from src.core.errlog import errdata,mklog
 import os.path as path
 import time
 import csv
