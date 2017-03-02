@@ -18,7 +18,7 @@ def export(data,project,config):
 
 # Actually push the stuff
 def exec_push(data,cmd,db):
-    errs = []
+    errs,errtxt = [],[]
     print('pushing {} rows to database: {}'.format(len(data),db))
     with psql.connect(database=db) as con:
         for row in data:
