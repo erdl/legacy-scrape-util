@@ -19,6 +19,7 @@ def export(data,project,config):
 # Actually push the stuff
 def exec_push(data,cmd,db):
     errs,errtxt = [],[]
+    dupcount = 0
     print('pushing {} rows to database: {}'.format(len(data),db))
     with psql.connect(database=db) as con:
         for row in data:
@@ -28,12 +29,15 @@ def exec_push(data,cmd,db):
                 con.commit()
             except Exception as err:
                 if 'duplicate key' in str(err):
+                    dupcount += 1
                     con.rollback()
                 else:
                     errs.append(row)
                     errtxt.append(err)
                     con.rollback()
     con.close()
+    if dupcount:
+        print('{} duplicate rows ignored'.format(dupcount))
     return errs,errtxt
 
 # Generate a custom insertion string.
