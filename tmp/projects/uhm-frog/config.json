@@ -4,8 +4,17 @@
     "nodes-file" : "sensors",
     "server-file" : "server"
   },
-  "reshape" : {},
+  "reshape" : {
+    "field-file" : "field-mapping"
+  },
   "export"  : {
-    "csv" : {}
+    "csv" : {},
+    "psql" : {
+      "database"  : "frog_uhm",
+      "table"     : "webctrl_bulk_trend_test_two",
+      "custom-insertion" : {
+        "datetime" : "to-timestamp"
+      }
+    }
   }
 }

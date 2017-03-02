@@ -30,6 +30,7 @@ def reshape_data(project,config,data):
     rutils = {}
     rord = []
     for kind in rconf:
+        if 'file' in kind: continue
         rutils[kind] = get_util('reshape',kind)
         rord.append(kind)
     skey = lambda k: rutils[k].ORD

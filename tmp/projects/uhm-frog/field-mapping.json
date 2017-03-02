@@ -1,0 +1,14 @@
+{
+  "sensor" : {
+    "name"  : "sensor_id",
+    "index" : 0
+  },
+  "timestamp" : {
+    "name"  : "datetime",
+    "index" : 1
+  },
+  "value" : {
+    "name"  : "value",
+    "index" : 2
+  }
+}
