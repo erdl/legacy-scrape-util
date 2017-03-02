@@ -27,7 +27,7 @@ def exec_push(data,cmd,db):
                     cur.execute(cmd,row)
                 con.commit()
             except Exception as err:
-                if 'duplicate key' in err:
+                if 'duplicate key' in str(err):
                     con.rollback()
                 else:
                     errs.append(row)
