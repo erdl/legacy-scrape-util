@@ -10,7 +10,9 @@ def export(data,project,config):
     # TODO: use csv config values for something...
     # probably for choosing file txt, etc...
     try: save_csv(project,data)
-    except: errdata(project,data,txt='csverr')
+    except Exception as err:
+        mklog(project,err)
+        errdata(project,data,txt='csverr')
 
 # Save it to a thing!
 def save_csv(project,data,txt='raw'):

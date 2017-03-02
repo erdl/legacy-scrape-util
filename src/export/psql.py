@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.errlog import errdata
+from src.core.errlog import errdata,errlog
 import psycopg2 as psql
 import time
 
@@ -12,9 +12,9 @@ def export(data,project,config):
         ins = custom_insertion(fields,config['custom-insertion'])
     else: ins = ','.join(['%s'] * len(fields))
     cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)
-    errs = exec_push(data,cmd,db)
+    errs,errtxt = exec_push(data,cmd,db)
     if errs: errdata(project,data,txt='psqlerr')
-
+    for err in errtxt: mklog(project,err)
 
 # Actually push the stuff
 def exec_push(data,cmd,db):
@@ -26,11 +26,15 @@ def exec_push(data,cmd,db):
                 with con.cursor() as cur:
                     cur.execute(cmd,row)
                 con.commit()
-            except psql.IntegrityError:
-                errs.append(row)
-                con.rollback()
+            except Exception as err:
+                if err == psql.IntegrityError:
+                    con.rollback()
+                else:
+                    errs.append(row)
+                    errtxt.append(err)
+                    con.rollback()
     con.close()
-    return errs
+    return errs,errtxt
 
 # Generate a custom insertion string.
 def custom_insertion(fields,insmap):

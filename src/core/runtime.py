@@ -24,6 +24,7 @@ def acquire_data(project,config,nonce):
 
 # Reshape the data via specified mapping(s).
 def reshape_data(project,config,data):
+    if not data: return
     if 'reshape' in config:
         rconf = config['reshape']
     else: return data
