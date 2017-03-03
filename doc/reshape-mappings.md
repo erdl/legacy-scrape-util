@@ -10,11 +10,11 @@ possible during data reshaping.
 Currently, there are three separate kinds of reshape
 operations:
 
-- [`content`](#content-mapping) replace values of given fields with new values.
+- [`content`](#content-mapping) replaces values of given fields with new values.
 
-- [`field`](#field-mapping) modify naming, ordering, and/or existence of data fields.
+- [`field`](#field-mapping) modifies naming, ordering, and/or existence of data fields.
 
-- [`generated`](#generated-mapping) add additional generated fields (e.g.; upload timestamp).
+- [`generated`](#generated-mapping) adds additional generated fields (e.g.; upload timestamp).
 
 Because of the nature of these tasks, the order of operations matters.
 The `content` step will always occur first, with the `field` step always
