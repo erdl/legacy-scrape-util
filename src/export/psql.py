@@ -22,19 +22,20 @@ def exec_push(data,cmd,db):
     dupcount = 0
     print('pushing {} rows to database: {}'.format(len(data),db))
     with psql.connect(database=db) as con:
+        con.set_session(autocommit=True)
         for row in data:
             try:
                 with con.cursor() as cur:
                     cur.execute(cmd,row)
-                con.commit()
+                #con.commit()
             except Exception as err:
                 if 'duplicate key' in str(err):
                     dupcount += 1
-                    con.rollback()
+                    #con.rollback()
                 else:
                     errs.append(row)
                     errtxt.append(err)
-                    con.rollback()
+                    #con.rollback()
     con.close()
     if dupcount:
         print('{} duplicate rows ignored'.format(dupcount))
