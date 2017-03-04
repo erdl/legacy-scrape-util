@@ -1,0 +1,18 @@
+{
+  "timestamp" : {
+    "name"  : "datetime",
+    "index" : 0
+  },
+  "sensor" : {
+    "name"  : "purpose_id",
+    "index" : 1
+  },
+  "unit" : {
+    "name"  : "units",
+    "index" : 2
+  },
+  "value" : {
+    "name"  : "reading",
+    "index" : 3
+  }
+}

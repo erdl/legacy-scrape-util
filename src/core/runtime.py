@@ -9,10 +9,18 @@ import src.core.errlog as errlog
 # that is rife with uncertainty.
 def run(project):
     config,nonce = params.get_parameters(project)
+    check_config(project,config)
     data,nonce = acquire_data(project,config,nonce)
     data = reshape_data(project,config,data)
     export_data(project,config,data)
     params.update_nonce(project,nonce)
+
+def check_config(project,config):
+    msg = 'no {} method defined for {}.'
+    require = ['acquire','export']
+    for req in require:
+        if not req in config:
+            raise Exception(msg.format(req,config))
 
 # Acquire the data via specifid method.
 # Returns data and a new set of nonce values.
@@ -30,6 +38,7 @@ def reshape_data(project,config,data):
     else: return data
     rutils = {}
     rord = []
+    print('reshaping {} rows...'.format(len(data)))
     for kind in rconf:
         if 'file' in kind: continue
         if not isactive(rconf[kind]): continue

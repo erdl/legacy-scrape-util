@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from collections import namedtuple
+import time
 
 ORD = 4
 
