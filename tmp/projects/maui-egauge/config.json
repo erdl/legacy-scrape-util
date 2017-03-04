@@ -24,7 +24,7 @@
       "is-active" : true,
       "database"  : "maui",
       "table"     : "reading",
-      "type-conversions" : {
+      "custom-insertion" : {
         "datetime" : "to-timestamp"
         ,"upload_timestamp" : "to-timestamp"
       }
