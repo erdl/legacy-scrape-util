@@ -16,14 +16,17 @@ def reshape(project,config,data):
 # mapping function for each specified field.
 def exec_mapping(data,config):
     errors = []
+    ignores = 0
     for field in config:
         if not data: break
         if 'sub-map' in config[field]:
-            vals,errs = sub_map(data,field,config[field])
+            vals,errs,ign = sub_map(data,field,config[field])
         else:
-            vals,errs = map_field(data,field,config[field])
+            vals,errs,ign = map_field(data,field,config[field])
         errors += errs
+        ignores += ign
         data = vals
+    print('rows ignored during remapping: {}'.format(ignores))
     return data,errors
 
 # Recursively generate mapping with
@@ -37,6 +40,7 @@ def sub_map(data,field,fmap):
     if 'ignore' in fmap:
         ignore = [fmt(i) for i in fmap['ignore']]
     else: ignore = []
+    ignores = 0
     ignrows = [ r for r in data if fmt(r[index]) in ignore ]
     vmap = fmap['map']
     vmap = { fmt(k) : vmap[k] for k in vmap }
@@ -44,14 +48,15 @@ def sub_map(data,field,fmap):
         rows = [ r for r in data if fmt(r[index]) == val ]
         if not rows: continue
         if 'sub-map' in vmap[val]:
-            mrows,erows = sub_map(rows,field,vmap[val])
+            mrows,erows,ign= sub_map(rows,field,vmap[val])
         else:
-            mrows,erows = map_field(rows,field,vmap[val])
+            mrows,erows,ign= map_field(rows,field,vmap[val])
         mapped += mrows
-        maperr += erows 
+        maperr += erows
+        ignores += ign
         data = [ r for r in data if not r in rows ]
     maperr += data
-    return mapped,maperr
+    return mapped,maperr,ignores
 
 # Map new values to a given field.
 def map_field(data,field,fmap):
@@ -60,6 +65,7 @@ def map_field(data,field,fmap):
     if 'ignore' in fmap:
         ignore = [i.lower() for i in fmap['ignore']]
     else: ignore = []
+    ignores = 0
     vmap = fmap['map']
     vmap = { k.lower() : vmap[k] for k in vmap }
     for r in data:
@@ -68,6 +74,8 @@ def map_field(data,field,fmap):
         if v in vmap:
             l[index] = vmap[v]
             mapped.append(Row(*l))
-        elif v in ignore: continue
+        elif v in ignore:
+            ignores += 1
+            continue
         else: maperr.append(Row(*l))
-    return mapped,maperr
+    return mapped,maperr,ignores

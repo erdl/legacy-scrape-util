@@ -3,7 +3,6 @@ from importlib import import_module
 import src.core.parameters as params
 import src.core.errlog as errlog
 
-
 # Primary entry point for runtime.
 # The one constant point in a world
 # that is rife with uncertainty.
@@ -15,6 +14,8 @@ def run(project):
     export_data(project,config,data)
     params.update_nonce(project,nonce)
 
+# Check config file for existence
+# of any required fields.
 def check_config(project,config):
     msg = 'no {} method defined for {}.'
     require = ['acquire','export']
@@ -28,6 +29,7 @@ def acquire_data(project,config,nonce):
     dconf = config['acquire']
     scraper = get_util('acquire',dconf['type'])
     data,nonce = scraper.scrape(project,dconf,nonce)
+    print('rows acquired during scrape: {}'.format(len(data)))
     return data,nonce
 
 # Reshape the data via specified mapping(s).
@@ -38,7 +40,6 @@ def reshape_data(project,config,data):
     else: return data
     rutils = {}
     rord = []
-    print('reshaping {} rows...'.format(len(data)))
     for kind in rconf:
         if 'file' in kind: continue
         if not isactive(rconf[kind]): continue
