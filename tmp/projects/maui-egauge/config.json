@@ -21,7 +21,7 @@
       "save-to" : "default"
     },
     "psql" : {
-      "is-active" : false,
+      "is-active" : true,
       "database"  : "maui",
       "table"     : "reading",
       "type-conversions" : {
