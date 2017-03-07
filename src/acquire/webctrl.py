@@ -11,6 +11,8 @@ def scrape(project,config,nonce):
     nonce_new = {k:nonce[k] for k in nonce}
     data = []
     query = new_query(config['server'])
+    # cycle through all nodes, querying
+    # all sensors associated with each node.
     for node in config['nodes']:
         sensors = config['nodes'][node]
         for sn in sensors:
@@ -22,9 +24,11 @@ def scrape(project,config,nonce):
             rows = [lrow(r['t'],r['a']) for r in rslt if not '?' in r.values()]
             if not rows: continue
             fltr = lambda r: r.timestamp
+            # add the most recent timestamp to
+            # collection of new nonce values.
             nonce_new[sn] = max(rows,key=fltr).timestamp
             data += rows
-    if data: nonce = nonce_new
+    nonce.update(nonce_new)
     return data,nonce
 
 # Add a new nonce field for any sensors

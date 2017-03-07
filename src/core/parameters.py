@@ -6,8 +6,11 @@ import os
 
 # Loage gauges and nonce.
 def get_parameters(project):
+    # check that project folder exists.
     check_project(project)
+    # load configuration from project folder.
     config = get_config(project)
+    # load nonce from project folder.
     nonce = get_nonce(project)
     return config,nonce
 
@@ -20,9 +23,11 @@ def check_project(project):
 # get project configuration
 def get_config(project):
     fname = 'config.json'
+    # load core configuration file.
     config = get_projfile(project,fname)
     if not config:
         raise Exception('no config found for {}'.format(project))
+    # expand any file specifiers in configuration.
     config = expand_config(project,config)
     return config
 
@@ -54,16 +59,19 @@ def expand_config(project,config):
         cfield = config[c]
         new[c] = {}
         for k in cfield:
+            # act only on fields ending in '-file'.
             if not '-file' in k: continue
             n = k.split('-').pop(0)
+            # treats value as name of file to be loaded.
             d = get_projfile(project,cfield[k])
             if d: new[c][n] = d
             else: raise Exception('no file named {}'.format(cfield[k]))
+    # expand configuration w/ loaded files.
     for f in new:
         config[f].update(new[f])
     return config
 
-# Update the nonce.
+# Update the nonce file with new value(s).
 def update_nonce(project,nonce):
     check_project(project)
     fpath = 'tmp/projects/{}/nonce.json'.format(project)

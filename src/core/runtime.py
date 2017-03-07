@@ -7,12 +7,20 @@ import src.core.errlog as errlog
 # The one constant point in a world
 # that is rife with uncertainty.
 def run(project):
+    # extract conigurationa and nonce
+    # from the appropriate project file.
     config,nonce = params.get_parameters(project)
+    # check configuration for required fields.
     check_config(project,config)
+    # acquire data & updated nonce values.
     data,nonce = acquire_data(project,config,nonce)
+    # reshape the data into the desired form.
     data = reshape_data(project,config,data)
+    # push data to one or more destinations.
     export_data(project,config,data)
+    # update the nonce file w/ new values.
     params.update_nonce(project,nonce)
+
 
 # Check config file for existence
 # of any required fields.
@@ -27,10 +35,12 @@ def check_config(project,config):
 # Returns data and a new set of nonce values.
 def acquire_data(project,config,nonce):
     dconf = config['acquire']
+    # import & run the specified scraper.
     scraper = get_util('acquire',dconf['type'])
     data,nonce = scraper.scrape(project,dconf,nonce)
     print('rows acquired during scrape: {}'.format(len(data)))
     return data,nonce
+
 
 # Reshape the data via specified mapping(s).
 def reshape_data(project,config,data):
@@ -40,16 +50,21 @@ def reshape_data(project,config,data):
     else: return data
     rutils = {}
     rord = []
+    # assemble list of active reshape mappings.
     for kind in rconf:
+        # ignore file specifiers.
         if 'file' in kind: continue
         if not isactive(rconf[kind]): continue
         rutils[kind] = get_util('reshape',kind)
         rord.append(kind)
+    # sort reshape utilites by their ORD variable.
     skey = lambda k: rutils[k].ORD
     rord = sorted(rord,key=skey)
+    # run all reshape utilities across data.
     for rs in rord:
         data = rutils[rs].reshape(project,rconf[rs],data)
     return data
+
 
 # Save the data via specified channel(s).
 def export_data(project,config,data):
@@ -57,9 +72,12 @@ def export_data(project,config,data):
         print('no values to export.')
         return
     exconf = config['export']
+    # iteratively run configured exports.
     for kind in exconf:
+        # ignore file specifiers.
         if 'file' in kind: continue
         if not isactive(exconf[kind]): continue
+        # load & run specified export utility.
         exutil = get_util('export',kind)
         exutil.export(data,project,exconf[kind])
 

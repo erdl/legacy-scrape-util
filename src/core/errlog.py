@@ -6,11 +6,15 @@ import os.path as path
 
 # Generate and update a simple and readable log file.
 def mklog(project,text):
+    # surround error text in time & project specifiers.
     hdr  = 'logtime............{}'.format(int(time.time()))
     proj = 'project............{}'.format(project)
     ftr  = '...................endlog\n'
+    # check appropriate error directory
+    # and generate it if necessary.
     errdir = dirset(project)
     fpath  = errdir + 'errlog.txt'
+    # generate (or append to) error log.
     with open(fpath,'a') as fp:
         write = lambda txt: print(txt,file=fp)
         write(hdr)
@@ -21,9 +25,15 @@ def mklog(project,text):
 # write a csv of improperly formatted
 # data to an appropriate errors file.
 def errdata(project,data,txt='fmterr'):
+    if not data: return
+    # check appropriate error directory
+    # and generate it if necessary.
     errdir = dirset(project)
+    # generate filename of form `txt-time.csv`.
     fpath = errdir + txt + '-'+ str(int(time.time())) + '.csv'
+    # extract field names from data.
     fields = data[0]._fields
+    # write data to csv.
     with open(fpath,'w') as fp:
         print('writing {} malformed rows to: {}'.format(len(data),fpath))
         writer = csv.writer(fp)
