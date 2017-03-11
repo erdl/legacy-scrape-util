@@ -74,7 +74,7 @@ should be treated as an error.
 ## Boilerplate
 
 Basically, just copy-pasta this template into your implementation,
-and then get to working making it do what you need:
+and get to work making it do what you need:
 
 ````python
 
