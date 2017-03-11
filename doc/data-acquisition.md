@@ -46,8 +46,8 @@ constructor with five fields: `node`, `sensor`, `unit`, `timestamp`, and `value`
 ````python
 In [1]: from src.core.row import Row
 
-In [2]: Row('room203', 'light', 'lux', 946166399, 55)
-Out[2]: row(node='room203', sensor='light', unit='lux', timestamp=946166399, value=55)
+In [2]: Row('room203', 'light', 'lux', 946166399.0, 66.6)
+Out[2]: row(node='room203', sensor='light', unit='lux', timestamp=946166399.0, value=66.6)
 
 ````
 

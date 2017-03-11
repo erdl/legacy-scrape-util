@@ -24,8 +24,8 @@ data has a one-to-one mapping.
 The project will be the named instance over which a set of
 configurations apply.  As such, a project can be a single persistent
 variable across a given cycle of the application.  All remaining
-fields are fields for which more than one value may exist within a single,
-set of data, and as such should be logged on a
+fields are fields for which more than one value may exist within a single
+set of data, and as such they should be logged on a
 per instance basis for clarity and simplicity.
 Unit and Sensor will presumably change many times across
 a single project instance, but presumably vary together.
@@ -45,26 +45,38 @@ Since the Data Logging step is separated from any direct data
 manipulation, we can reasonably allow all exported data to infer
 fields and shape based upon the output of the reshaping step.
 
-## File-System Map
+## Temporary Files
+
+Any data which is not a hard-coded feature (config files,
+CSVs, error logs, etc...) will live inside the `tmp` directory.
+Sub-directories will segregate data by kind and project.  The only
+required directory for a given project to be run should be
+`tmp/projects/projectname/`.  This will be where the project's
+`config.json` file will live, along with any other resources that
+the project cannot generate at runtime.  Two other
+sub-sections of `tmp` are currently defines, `outputs` and `errors`.
+Both of these file structures are generated at runtime if and when
+they are needed.  The map below depicts the file system
+as it is currently specified:
 
 ````
-tmp
 .
-|___projects
-    .
-    |___projname
-        .
-        |___config.json
-        |___...
-|___outputs
-    .
-    |___projname
-        .
-        |___...
-|___errors
-    .
-    |___log.txt
-    |___...
+|___tmp
+    |___projects
+    |   |___projname
+    |   |   |___config.json
+    |   |   |...
+    |   |...
+    |___outputs
+    |   |___projname
+    |   |   |...
+    |   |...
+    |___errors
+    |   |___projname
+    |   |   |__log.txt
+    |   |   |...
+    |   |...
+    |...
 
 ````
 
@@ -88,4 +100,4 @@ in [`doc/reshape-mappings.md`](./doc/reshape-mappings.md).
 
 ## Contribution
 
-Pull requests welcome.
+Pull requests welcome!
