@@ -8,12 +8,12 @@ allow it to be effectively interchangeable with any other
 ## Input
 
 All implementations need to have a single entry-point with
-a standardized set of arguments.  The current standard is a
-function named `scrape` which accepts the arguments `project`,
+a standardized set of arguments.  The current standard is to implement
+a function named `scrape` which accepts the arguments `project`,
 `config`, and `nonce` (in that order).
 
 The `project` argument is a string representing the project name.
-Typically, this value is only actually used if errors occur during
+Typically, this value is only used if errors occur during
 data acquisition, but this may depend on the internals of a given
 implementation.
 
@@ -30,7 +30,8 @@ scrape the past 24 hours for any elements which are not in the nonce.
 Because different implementations may use the nonce values in different
 ways (or not at all), a given implementation is responsible for
 returning an updated version of the nonce if such functionality is
-desired.
+desired.  Implementations which do not use the nonce should
+return an empty dictionary instead.
 
 ## Output
 
@@ -68,4 +69,25 @@ modules do assume this, and as such it should be considered
 the standard for this model.  If `node` or `unit` are not
 available, they can be given a default value of `"undefined"`,
 but if `sensor`, `timestamp`, or `value` are unavailable, this
-is an error.
+should be treated as an error.
+
+## Boilerplate
+
+Basically, just copy-pasta this template into your implementation,
+and then get to working making it do what you need:
+
+````python
+
+from src.core.row import Row
+
+def scrape(project,config,nonce):
+    # do all the things!
+    # ...
+    return rows,nonce
+
+````
+
+## Contribution
+
+If you have made an acquisition module that plays nicely with
+the rest of the ecosystem, please feel free to submit it!
