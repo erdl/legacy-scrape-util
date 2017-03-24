@@ -17,9 +17,12 @@ by greatly simplifying configuration and troubleshooting across
 file parsing implementations.
 
 
-## Config
+## Example Config
 
 ```toml
+# example `acquire` section, using the `static`
+# acquisition method, with the `hoboware` parser.
+
 [acquire]
 type = "static"
 suffix = "csv"
@@ -29,13 +32,32 @@ source = "path/to/csv/files/" # optional
 type = "hoboware"
 # args to be passed to the parser go here.
 
-
 [acquire.moveto] # optional section
 fmt = "move/here/on/success/"
 err = "move/here/on/failure/"
 ```
 
+## Boilerplate
+
+```python
+#!/usr/bin/env python3
+from src.core.row import Row
+
+# List required configuration fields if any.
+REQUIRE = []
+
+# Entry-point called by `static`.  Arguments will
+# be a dictionary consisting of any keys/values
+# found in [acquire.parser], and a path which
+# points to the file in need of conversion.
+def parse(config,filepath):
+    # do all the things...
+    return rows
+```
+
+
 ## Development Notes
 
 Need to decide if the parser implementation
 gets passed a file path or a file pointer...
+Current implementation uses file path.
