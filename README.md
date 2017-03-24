@@ -106,7 +106,7 @@ be quite simple as well:
 type = "egauge"
 
 [acquire.gauges]
-some-gauge-id = 000
+some-gauge-id = 0 
 
 [export]
 csv = true
