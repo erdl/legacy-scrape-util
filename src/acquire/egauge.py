@@ -5,36 +5,55 @@ import time
 
 # primary entry point for scrape of egauges.
 # Returns any acquired data & updated nonce.
-def scrape(project,config,nonce):
-    gauges = config["nodes"]
-    nonce = check_nonce(nonce,gauges)
-    data,nonce_new = [],{}
+def scrape(project,config,state):
+    gauges = config["gauges"]
+    state = check_state(gauges,state)
+    nonce = state['nonce']
+    data = []
     fltr = lambda r : r.timestamp
     for gid in gauges:
         print('querying gauge: {}...'.format(gid))
         raw = query(gauges[gid],nonce[gid])
         rows = fmt_query(gid,raw)
-        nonce_new[gid] = max(rows,key=fltr).timestamp if rows else nonce[gid]
+        if not rows: continue
+        fltr = lambda r: r.timestamp
+        nonce[gid] = max(rows,key=fltr).timestamp
         data += rows
-    nonce.update(nonce_new)
     print('gauge queries complete...')
-    return data,nonce
+    state['nonce'] = nonce
+    return data,state
 
-# Check if nonce exists for each node.
-# If does not exist, set node's nonce
-# to t minus 24 hours.
-def check_nonce(nonce,gauges):
-    delta = time.time() - 86400
+
+# check on state, generating any missing values.
+def check_state(gauges,state):
+    # read & remove init section if found.
+    if 'init' in state:
+        init = state['init']
+        del state['init']
+        delta = init['start-from'] if 'start-from' in init else None
+    else: delta = None
+    if not 'nonce' in state: state['nonce'] = {}
+    state['nonce'] = check_nonce(gauges,state['nonce'],delta)
+    if not 'nonce-file' in state: state['nonce-file'] = 'nonce'
+    return state
+
+
+# Add a new nonce field for any gauge
+# not found in the nonce.
+def check_nonce(gauges,nonce,delta=None):
+    if not delta:
+        delta = time.time() - 86400
     for gid in gauges:
         if not gid in nonce:
             nonce[gid] = delta
     return nonce
 
+
 # Query a specified egauge.
 # Returns a dictionary of all columns w/ headers as keys.
 def query(gauge,after):
     uri = 'http://egauge{}.egaug.es/cgi-bin/egauge-show?c&C&m'
-    params = {'w':after}
+    params = { 'w' : int(after) }
     r = requests.get(uri.format(gauge),params=params)
     # break up the recieved csv into two-dimensional list structure.
     rows = [[y for y in x.split(',')] for x in r.text.splitlines()]

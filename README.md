@@ -52,9 +52,9 @@ CSVs, error logs, etc...) will live inside the `tmp` directory.
 Sub-directories will segregate data by kind and project.  The only
 required directory for a given project to be run should be
 `tmp/projects/projectname/`.  This will be where the project's
-`config.json` file will live, along with any other resources that
+configuration files will live, along with any other resources that
 the project cannot generate at runtime.  Two other
-sub-sections of `tmp` are currently defines, `outputs` and `errors`.
+sub-sections of `tmp` are currently defined: `outputs` and `errors`.
 Both of these file structures are generated at runtime if and when
 they are needed.  The map below depicts the file system
 as it is currently specified:
@@ -64,7 +64,8 @@ as it is currently specified:
 |___tmp
     |___projects
     |   |___projname
-    |   |   |___config.json
+    |   |   |___config.toml
+    |   |   |___state.toml
     |   |   |...
     |   |...
     |___outputs
@@ -93,9 +94,40 @@ For example, if we wish to have our `export` field imported from
 a file named `export-settings.json`, we can replace the `export` field
 in our main `config.json` file with `"export-file" : "export-settings"`.
 
-For specific information concerning the configuration of
-mappings for the reshaping step, see the description and examples
-in [`doc/reshape-mappings.md`](./doc/reshape-mappings.md).
+Configuration files are the main way we tell the program what we
+want done.  Configuration files can be in `json` or `toml` format.
+The `toml` format is generally preferred because it tends to be
+more readable, but do what comes naturally.  Configuration files
+can be quite complex when one's needs are complex, but they can
+be quite simple as well:
+
+```toml
+[acquire]
+type = "egauge"
+
+[acquire.gauges]
+some-gauge-id = 000
+
+[export]
+csv = true
+
+```
+
+The `type = "egauge"` field indicates that we want to scrape data
+from the egauge API.  Each type of data-acquisition defines its
+own sub-sections which it requires.  For the egauge scraper, all
+we need is a `gauges` section, which consists of a set of gauge
+names, and their corresponding id numbers.
+
+The simplest option for data-export is just to save our data,
+as is, to a csv file.  With no other arguments given, this will
+produce a timestamped file located in `tmp/outputs/projectname/`.
+
+By default, all `acquire` steps produce rows of data with
+the columns: `node`, `sensor`, `unit`, `timestamp`, and `value`.
+We reshape our data by adding a `[reshape]` section to our configuration
+file.  For specific information concerning data-reshaping, take a
+look at [`doc/reshape-mappings.md`](./doc/reshape-mappings.md).
 
 
 ## Contribution

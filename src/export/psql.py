@@ -6,12 +6,12 @@ import time
 
 # Main push-to-psql entry point
 def export(data,project,config):
-    db  = config['database']
-    tbl = config['table']
+    db  = config['general']['database']
+    tbl = config['general']['table']
     fields = data[0]._fields
     # handle custom-inserion instance if needed.
-    if 'custom-insertion' in config:
-        ins = custom_insertion(fields,config['custom-insertion'])
+    if 'conversions' in config:
+        ins = custom_insertion(fields,config['conversions'])
     # default is just standard psycopg2 formatting...
     else: ins = ','.join(['%s'] * len(fields))
     cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)

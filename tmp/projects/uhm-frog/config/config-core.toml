@@ -1,0 +1,13 @@
+[acquire]
+type = "webctrl"
+sensor-file = "sensor-map"
+server-file = "server-info"
+
+[reshape]
+field-file = "field-map"
+value-file = "value-map"
+extra = false
+
+[export]
+csv = true
+psql-file = "psql-config"

@@ -1,0 +1,9 @@
+[sensor]
+ignores = ["weather-station"]
+sub-map = "node"
+
+[sensor.frog-1]
+solar-2 = 0
+
+[sensor.frog-2]
+whole-building = 1

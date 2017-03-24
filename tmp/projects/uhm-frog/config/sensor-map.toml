@@ -1,0 +1,14 @@
+[[frog-1]]
+name = "solar-2"
+path = "ABSPATH:1:#powerscout_frog_1h/elec_demand_tn"
+unit = "kW"
+
+[[weather-station]]
+name = "dry-bulb-temp"
+path = "ABSPATH:1:#netzero_weather_conditions/oa_temp_tn"
+unit = "C"
+
+[[frog-2]]
+name = "whole-building"
+path = "ABSPATH:1:#powerscout_frog_2d/n647"
+unit = "kWh"

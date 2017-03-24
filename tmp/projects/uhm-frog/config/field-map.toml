@@ -1,0 +1,11 @@
+[sensor]
+name = "sensor_id"
+slot = 0
+
+[timestamp]
+name = "datetime"
+slot = 1
+
+[value]
+name = "value"
+slot = 2

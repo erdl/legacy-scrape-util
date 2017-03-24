@@ -5,41 +5,61 @@ import time
 
 
 # Primary entry point for webctrl scrape.
-# Returns data & nonce_new
-def scrape(project,config,nonce):
-    nonce = check_nonce(nonce,config['nodes'])
-    nonce_new = {k:nonce[k] for k in nonce}
+# Returns data & updated state.
+def scrape(project,config,state):
+    state = check_state(config,state)
+    nonce = state['nonce']
+    sensor_map = config['sensor']
     data = []
     query = new_query(config['server'])
     # cycle through all nodes, querying
     # all sensors associated with each node.
-    for node in config['nodes']:
-        sensors = config['nodes'][node]
-        for sn in sensors:
-            nn = nonce[sn]
-            qs = sensors[sn]['query-string']
-            rslt = query(qs,nn)
-            unit = sensors[sn]['unit']
-            lrow = lambda t,v : Row(node,sn,unit,float(t//1000),float(v))
-            rows = [lrow(r['t'],r['a']) for r in rslt if not '?' in r.values()]
+    for node in sensor_map:
+        sensors = sensor_map[node]
+        for sensor in sensors:
+            if 'actv' in sensor:
+                if not sensor['actv']: continue
+            name = sensor['name']
+            path = sensor['path']
+            unit = sensor['unit'] if 'unit' in sensor else 'undefined'
+            after = nonce[node][name]
+            result = query(path,after)
+            lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
+            rows = [lrow(r['t'],r['a']) for r in result if not '?' in r.values()]
             if not rows: continue
             fltr = lambda r: r.timestamp
-            # add the most recent timestamp to
-            # collection of new nonce values.
-            nonce_new[sn] = max(rows,key=fltr).timestamp
+            nonce[node][name] = max(rows,key=fltr).timestamp
             data += rows
-    nonce.update(nonce_new)
-    return data,nonce
+    state['nonce'] = nonce
+    if not 'nonce-file' in state:
+        state['nonce-file'] = 'nonce'
+    return data,state
+
+
+# check on state, generating any missing values.
+def check_state(config,state):
+    # read & remove init section if found.
+    if 'init' in state:
+        delta = state['init']['start-from']
+        del state['init']
+    else: delta = None
+    if not 'nonce' in state: state['nonce'] = {}
+    state['nonce'] = check_nonce(state['nonce'],config['sensor'],delta)
+    return state
+
 
 # Add a new nonce field for any sensors
 # not found in the nonce.
-def check_nonce(nonce,nodes):
-    delta = time.time() - 86400
-    for n in nodes:
-        sensors = nodes[n]
+def check_nonce(nonce,sensor_map,delta=None):
+    if not delta:
+        delta = time.time() - 86400
+    for node in sensor_map:
+        sensors = sensor_map[node]
+        if not node in nonce:
+            nonce[node] = {}
         for s in sensors:
-            if s not in nonce:
-                nonce[s] = delta
+            if s['name'] not in nonce[node]:
+                nonce[node][s['name']] = delta
     return nonce
 
 # Generate a pre-configured query callable
@@ -47,9 +67,10 @@ def check_nonce(nonce,nodes):
 def new_query(server):
     tp = lambda t: time.strftime('%Y-%m-%d',time.gmtime(t))
     now = time.time()
-    u,a = server['uri'],server['auth']
+    uri = server['query']['uri']
+    auth = ( server['login']['name'], server['login']['pass'] )
     # return a lambda requiring args querystring,nonce
-    lam = lambda q,n : exec_query(u,q,a,tp(n),tp(now))
+    lam = lambda q,n : exec_query(uri,q,auth,tp(n),tp(now))
     return lam
 
 # Actually execute the query of the webctrl server.

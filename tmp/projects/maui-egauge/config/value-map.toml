@@ -1,0 +1,11 @@
+[sensor.set]
+ignores = [ "generation" ]
+
+[sensor.map]
+"usage" = 31
+"plug loads" = 32
+"whole panel" = 33
+"lights" = 34
+"fans" = 35
+"mauka portable (P7B AC)" = 36
+"makai portable (P7A AC)" = 37

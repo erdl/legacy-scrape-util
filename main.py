@@ -2,7 +2,7 @@
 from src.core.runtime import run
 
 def Main():
-    projects = ['maui-egauge']
+    projects = ['uhm-frog','maui-egauge']
     for proj in projects:
         run(proj)
 

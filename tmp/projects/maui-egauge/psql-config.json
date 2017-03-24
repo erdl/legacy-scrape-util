@@ -1,9 +1,0 @@
-{
-  "is-active" : false,
-  "database"  : "maui",
-  "table"     : "reading",
-  "type-conversions" : {
-    "datetime" : "to-timestamp"
-    ,"upload_timestamp" : "to-timestamp"
-  }
-}

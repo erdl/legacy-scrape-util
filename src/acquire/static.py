@@ -5,7 +5,7 @@ import os.path as path
 import os
 
 # primary entry point.
-def scrape(project,config,nonce):
+def scrape(project,config,state):
     parser,source = setup(project,config)
     ext = '.{}'.format(config['suffix'])
     files = [ f for f in os.listdir(source) if f.endswith(ext) ]
@@ -22,7 +22,7 @@ def scrape(project,config,nonce):
             mklog(project,err)
             errs += f
     movefiles(project,config,source,fmts,errs)
-    return rows,nonce
+    return rows,state
 
 # get perser and source directory while
 # performing all necessary pre-checks.

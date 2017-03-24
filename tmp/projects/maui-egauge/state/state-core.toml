@@ -1,0 +1,3 @@
+nonce-file = "nonce"
+[project]
+is-active = true

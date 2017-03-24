@@ -26,40 +26,54 @@ Likewise, we force generated fields to be appended to the final field layout
 such that any field mappings can be completely agnostic of any generated fields
 and vice-versa.
 
-## Content Mapping
+## Value Mapping
 
-Content mappings are done on a per-field basis.  The top level of
-the content configuration file/section should include a key for
-each field that requires a content mapping.  Each field declaration
-should contain a `map` section and an `ignore` section.  The map section
-should be a key-value pairing of expected values to their desired replacements.
-Lets say, for example, that we want to re-map our `sensor` field into a set
-of integer ids.  We want to map `temperature` to `0`, `humidity` to `1`, and
-we want to discard any data points from `lux` sensors.  We would achieve
-this like so:
+Value mappings allow us to change one expected value into another for one or
+more fields.  We instantiate a section for each field of interest, listing
+expected values, and what they should be replaced with.  Lets imagine that
+we have some set of data where the sensor corresponding to a given data point
+may be `temperature` or `humidity`, but that we would prefer to identify our
+sensors by numeric IDs instead.  Easy!  Just add a `[sensor]` section to
+your value-mapping configuration file, and insert the mapping in the form
+`oldValue = newValue`:
 
-````javascript
-"sensor" : {
-  "map" : {
-    "temperature" : 0,
-    "humidity" : 1
-  },
-  "ignore" : [
-    "lux"
-  ]
-}
-````
+```toml
+[sensor]
+temperature = 0
+humidity = 1
+```
 
-Notice that we cannot simply leave `lux` out.  We don't want out script
-to be silently ignoring unexpected values.  Any unexpected values are
-instead saved to a csv file in `tmp/errors/projectname/` so that they can be
-analyzed and re-integrated at a later date.
+What if there is some data that we want to discard?  Just add an `ignores`
+list to your configuration:
 
-This is the simple content mapping case, and it works well for most use cases.
-Sometimes, however, we find ourselves needing to create a mapping that is
-dependent on the values of more than one field.  What if, for example, we
-have two different ids for `humidity` based on whether the sensor
-is associated with `logger_one` or `logger_two`?  As you may recall,
+```toml
+[sensor]
+ignores = ["light"]
+temperature = 0
+humidity = 1
+```
+
+The ignores list is important if there are any expected values for which
+you do not have an explicit mapping.  We don't want our conversions to fail
+silently.  Any value which is not either mapped or ignored is something unexpected
+and needs to be treated like an error.  Data points containing unexpected values
+will be saved to a `csv` file in `tmp/errors/projectname/` for later examination.
+If you happen to have `ignores` as an expected value, fear not!  You have two options;
+you may precede `ignores` by any number of underscores (the field with the most underscores
+will be treated as the ignores list), or you can segregate your settings and mappings like so:
+
+```toml
+[sensor.set]
+...  # settings go here...
+[sensor.map]
+... # mappings go here...
+```
+
+What we have seen so far is the simple content mapping case, and it works well
+for most use cases. Sometimes, however, we find ourselves needing to create a
+mapping that is dependent on the values of more than one field.  What if,
+for example, we have two different IDs for `humidity` based on whether the
+sensor is associated with `logger-one` or `logger-two`?  As you may recall,
 the `node` field is used in distinguishing named groupings of sensors
 (building, logger, sub-project, etc...).  What we need, is to be able
 to make two separate `sensor` mappings, depending on the content of the
@@ -70,19 +84,16 @@ execute specific mappings on the target field.  This can be
 a bit difficult to imagine at first, but lets take a look at what our
 new `humidity` sensor mapping looks like:
 
-````javascript
-"sensor" : {
-  "sub-map" : "node"
-  "map" : {
-    "logger_two" : {
-      "map" : { "humidity" : 1 }
-    }
-    "logger_three" : {
-      "map" : { "humidity" : 2 }
-    }
-  }
-}
-````
+```toml
+[sensor]
+sub-map = "node"
+
+[sensor.logger-one]
+humidity = 1
+
+[sensor.logger-two]
+humidity = 2
+```
 
 As we can see, we start with the same top-level field declaration;
 telling the program that the final result of the mapping process
@@ -91,14 +102,27 @@ for the `node` field.  This tells the program to divide up the data
 based upon the contents of the node field first.  We pair each possible
 `node` value with the `sensor` mapping that applies to all data points
 with that `node` value.  Ignore blocks are optional, but we could have easily
-added an ignore block to the `node` mapping, or either of the
-contained `sensor` mappings.
+added an ignore block at any stage.  An ignore block next to `sub-map = "node"`
+will let us ignore one or more possible node values, and an ignore block under
+`[sensor.logger-one]` will allow us to ignore some set of the sensor values
+which may appear alongside `logger-one`.  Here is what it would look like if
+we wanted to ignore `logger-two`, and also ignore that pesky light sensor again:
+
+```toml
+[sensor]
+sub-map = "node"
+ignores = ["logger-two"]
+
+[sensor.logger-one]
+humidity = 1
+ignores = ["light"]
+```
 
 The `sub-map` flag is capable of being applied recursively.  If we so desired,
 we could declare an additional sub mapping within one, or both, of our
-existing `node` sub maps.  This feature, however, should be your *last*
+existing `node` sub maps.  This feature, however, should be your last
 resort.  If your data needs more than two levels deep of recursive
-content remapping, you've done a terrible thing and you should be *ashamed*
+content remapping, you have done a terrible thing and you should be *ashamed*
 of yourself.  Seriously.  What is *wrong* with you?
 
 ## Field Mapping

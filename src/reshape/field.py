@@ -20,7 +20,7 @@ def map_fields(data,fieldmap):
     for di,df in enumerate(dfields):
         if not df in fieldmap: continue
         mf = fieldmap[df]['name']
-        mi = fieldmap[df]['index']
+        mi = fieldmap[df]['slot']
         indexmap.append((mi,di))
         namemap.append((mi,mf))
     sbi = lambda i: i[0]
