@@ -75,8 +75,8 @@ mapping that is dependent on the values of more than one field.  What if,
 for example, we have two different IDs for `humidity` based on whether the
 sensor is associated with `logger-one` or `logger-two`?  As you may recall,
 the `node` field is used in distinguishing named groupings of sensors
-(building, logger, sub-project, etc...).  What we need, is to be able
-to make two separate `sensor` mappings, depending on the content of the
+(building, logger, sub-project, etc...).  What we need is to be able
+to make two separate `sensor` mappings depending on the content of the
 `node` field.  We can achieve this with the `sub-map` flag.  This tells
 the program that it is about to encounter a *nested* mapping; it will
 need to split up the data based on the content some other field, and then

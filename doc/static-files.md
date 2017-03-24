@@ -19,6 +19,22 @@ file parsing implementations.
 
 ## Config
 
+```toml
+[acquire]
+type = "static"
+suffix = "csv"
+source = "path/to/csv/files/" # optional
+
+[acquire.parser]
+type = "hoboware"
+# args to be passed to the parser go here.
+
+
+[acquire.moveto] # optional section
+fmt = "move/here/on/success/"
+err = "move/here/on/failure/"
+```
+
 ````javascript
 {
   "type"   : "static",
