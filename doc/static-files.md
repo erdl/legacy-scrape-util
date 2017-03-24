@@ -35,24 +35,6 @@ fmt = "move/here/on/success/"
 err = "move/here/on/failure/"
 ```
 
-````javascript
-{
-  "type"   : "static",
-  "source" : "path/to/csv/files/", // optional
-  "suffix" : "csv",
-  "moveto" : { // optional
-    "fmt" : "path/to/successes/" // where to put originals on success
-    "err" : "path/to/errors" // where to put originals on failure
-  },
-  "parser" : {
-    "type" : "hoboware"
-    ... // parser configurations go here
-  }
-}
-
-````
-
-
 ## Development Notes
 
 Need to decide if the parser implementation
