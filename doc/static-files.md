@@ -44,6 +44,9 @@ err = "move/here/on/failure/"
 from src.core.row import Row
 
 # List required configuration fields if any.
+# This variable will be checked against the
+# provided configuration prior to the parser
+# being launched.
 REQUIRE = []
 
 # Entry-point called by `static`.  Arguments will
@@ -51,7 +54,7 @@ REQUIRE = []
 # found in [acquire.parser], and a path which
 # points to the file in need of conversion.
 def parse(config,filepath):
-    # do all the things...
+    # parse all the things...
     return rows
 ```
 

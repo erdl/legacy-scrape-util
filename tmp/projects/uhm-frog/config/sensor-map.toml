@@ -1,14 +1,475 @@
+# Sensor mapping for project-frog's webctrl scraper.
+
+# Frog 1
+[[frog-1]]
+name = "duct-return-humidity"
+path = "ABSPATH:1:#frog1_duct_sensors_1/m030"
+unit = "%"
+[[frog-1]]
+name = "duct-supply-humidity"
+path = "ABSPATH:1:#frog1_duct_sensors_1/m027"
+unit = "%"
+[[frog-1]]
+name = "zone-humidity-1"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_humidity_1_tn"
+unit = "%"
+[[frog-1]]
+name = "zone-humidity-2"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_humidity_2_tn"
+unit = "%"
+[[frog-1]]
+name = "duct-return-temp"
+path = "ABSPATH:1:#frog1_duct_sensors_1/m029"
+unit = "F"
+[[frog-1]]
+name = "duct-supply-temp"
+path = "ABSPATH:1:#frog1_duct_sensors_1/m025"
+unit = "F"
+[[frog-1]]
+name = "globe-temp"
+path = "ABSPATH:1:#frog1_room_sensors_1/globe_temp_1_tn"
+unit = "F"
+[[frog-1]]
+name = "wall-temp-1"
+path = "ABSPATH:1:#frog1_room_sensors_1/wall_temp_1_tn"
+unit = "F"
+[[frog-1]]
+name = "wall-temp-2"
+path = "ABSPATH:1:#frog1_room_sensors_1/wall_temp_2_tn"
+unit = "F"
+[[frog-1]]
+name = "wall-temp-3"
+path = "ABSPATH:1:#frog1_room_sensors_1/wall_temp_3_tn"
+unit = "F"
+[[frog-1]]
+name = "zone-temp-1"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_temp_1_tn"
+unit = "F"
+[[frog-1]]
+name = "zone-temp-2"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_temp_2_tn"
+unit = "F"
+[[frog-1]]
+name = "air-handler"
+path = "ABSPATH:1:#powerscout_frog_1b_/elec_demand_tn"
+unit = "kW"
+[[frog-1]]
+name = "service-lights"
+path = "ABSPATH:1:#powerscout_frog_1e/n676"
+unit = "kW"
+[[frog-1]]
+name = "building-services-it"
+path = "ABSPATH:1:#powerscout_frog_1f/n676"
+unit = "kW"
+[[frog-1]]
+name = "ceiling-fans"
+path = "ABSPATH:1:#powerscout_frog_1c_/elec_demand_tn"
+unit = "kW"
+[[frog-1]]
+name = "chiller"
+path = "ABSPATH:1:#powerscout_frog_1a/elec_demand_tn"
+unit = "kW"
+[[frog-1]]
+name = "exterior-lights"
+path = "ABSPATH:1:#powerscout_frog_1f/n670"
+unit = "kW"
+[[frog-1]]
+name = "fire-alarm"
+path = "ABSPATH:1:#powerscout_frog_1e/n679"
+unit = "kW"
+[[frog-1]]
+name = "lutron-lights"
+path = "ABSPATH:1:#powerscout_frog_1e/n670"
+unit = "kW"
+[[frog-1]]
+name = "solar-1"
+path = "ABSPATH:1:#powerscout_frog_1g/elec_demand_tn"
+unit = "kW"
 [[frog-1]]
 name = "solar-2"
 path = "ABSPATH:1:#powerscout_frog_1h/elec_demand_tn"
 unit = "kW"
-
-[[weather-station]]
+[[frog-1]]
+name = "whole-building"
+path = "ABSPATH:1:#powerscout_frog_1d_/elec_demand_tn"
+unit = "kW"
+[[frog-1]]
+name = "window-actuators"
+path = "ABSPATH:1:#powerscout_frog_1f/n679"
+unit = "kW"
+[[frog-1]]
+name = "air-handler"
+path = "ABSPATH:1:#powerscout_frog_1b_/n647"
+unit = "kWh"
+[[frog-1]]
+name = "service-lights"
+path = "ABSPATH:1:#powerscout_frog_1e/kwh_b_tn"
+unit = "kWh"
+[[frog-1]]
+name = "building-services-it"
+path = "ABSPATH:1:#powerscout_frog_1f/kwh_b_tn"
+unit = "kWh"
+[[frog-1]]
+name = "ceiling-fans"
+path = "ABSPATH:1:#powerscout_frog_1c_/n647"
+unit = "kWh"
+[[frog-1]]
+name = "chiller"
+path = "ABSPATH:1:#powerscout_frog_1a/n647"
+unit = "kWh"
+[[frog-1]]
+name = "exterior-lights"
+path = "ABSPATH:1:#powerscout_frog_1f/kwh_a_tn"
+unit = "kWh"
+[[frog-1]]
+name = "fire-alarm"
+path = "ABSPATH:1:#powerscout_frog_1e/kwh_c_tn"
+unit = "kWh"
+[[frog-1]]
+name = "lutron-lights"
+path = "ABSPATH:1:#powerscout_frog_1e/kwh_a_tn"
+unit = "kWh"
+[[frog-1]]
+name = "solar-1"
+path = "ABSPATH:1:#powerscout_frog_1g/n647"
+unit = "kWh"
+[[frog-1]]
+name = "solar-2"
+path = "ABSPATH:1:#powerscout_frog_1h/n647"
+unit = "kWh"
+[[frog-1]]
+name = "whole-building"
+path = "ABSPATH:1:#powerscout_frog_1d_/n647"
+unit = "kWh"
+[[frog-1]]
+name = "window-actuators"
+path = "ABSPATH:1:#powerscout_frog_1f/kwh_c_tn"
+unit = "kWh"
+[[frog-1]]
+name = "light"
+path = "ABSPATH:1:#frog1_room_sensors_1/light_sensor_1_tn"
+unit = "lux"
+[[frog-1]]
+name = "CO2"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_co2_1_tn"
+unit = "ppm"
+[[frog-1]]
+name = "air-handler-avg"
+path = "ABSPATH:1:#powerscout_frog_1b_/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "building-services-avg"
+path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_b_tn"
+unit = "kW"
+[[frog-1]]
+name = "ceiling-fans-avg"
+path = "ABSPATH:1:#powerscout_frog_1c_/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "chiller-avg"
+path = "ABSPATH:1:#powerscout_frog_1a/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "exterior-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_a_tn"
+unit = "kW"
+[[frog-1]]
+name = "fire-alarm-avg"
+path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_c_tn"
+unit = "kW"
+[[frog-1]]
+name = "lutron-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_a_tn"
+unit = "kW"
+[[frog-1]]
+name = "service-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_b_tn"
+unit = "kW"
+[[frog-1]]
+name = "solar-1-avg"
+path = "ABSPATH:1:#powerscout_frog_1g/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "solar-2-avg"
+path = "ABSPATH:1:#powerscout_frog_1h/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "whole-building-avg"
+path = "ABSPATH:1:#powerscout_frog_1d_/kw_avg_tn"
+unit = "kW"
+[[frog-1]]
+name = "window-actuators-avg"
+path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_c_tn"
+unit = "kW"
+[[frog-1]]
+name = "zone-humidity-3"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_humidity_3_tn"
+actv = false
+unit = "%"
+[[frog-1]]
+name = "zone-temp-3"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_temp_3_tn"
+actv = false
+unit = "F"
+[[frog-1]]
+name = "humidity"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_humidity"
+actv = false
+unit = "%"
+[[frog-1]]
 name = "dry-bulb-temp"
-path = "ABSPATH:1:#netzero_weather_conditions/oa_temp_tn"
-unit = "C"
+path = "ABSPATH:1:#frog1_room_sensors_1/zone_temp"
+actv = false
+unit = "F"
 
+# Frog 2
+[[frog-2]]
+name = "duct-return-humidity"
+path = "ABSPATH:1:#frog2_duct_sensors/m030"
+unit = "%"
+[[frog-2]]
+name = "duct-supply-humidity"
+path = "ABSPATH:1:#frog2_duct_sensors/m027"
+unit = "%"
+[[frog-2]]
+name = "zone-humidity-1"
+path = "ABSPATH:1:#frog2_room_sensors/zone_humidity_1_tn"
+unit = "%"
+[[frog-2]]
+name = "zone-humidity-2"
+path = "ABSPATH:1:#frog2_room_sensors/zone_humidity_2_tn"
+unit = "%"
+[[frog-2]]
+name = "duct-return-temp"
+path = "ABSPATH:1:#frog2_duct_sensors/m029"
+unit = "F"
+[[frog-2]]
+name = "duct-supply-temp"
+path = "ABSPATH:1:#frog2_duct_sensors/m025"
+unit = "F"
+[[frog-2]]
+name = "globe-temp"
+path = "ABSPATH:1:#frog2_room_sensors/globe_temp_1_tn"
+unit = "F"
+[[frog-2]]
+name = "zone-temp-1"
+path = "ABSPATH:1:#frog2_room_sensors/zone_temp_1_tn"
+unit = "F"
+[[frog-2]]
+name = "wall-temp-1"
+path = "ABSPATH:1:#frog2_room_sensors/wall_temp_1_tn"
+unit = "F"
+[[frog-2]]
+name = "wall-temp-2"
+path = "ABSPATH:1:#frog2_room_sensors/wall_temp_2_tn"
+unit = "F"
+[[frog-2]]
+name = "wall-temp-3"
+path = "ABSPATH:1:#frog2_room_sensors/wall_temp_3_tn"
+unit = "F"
+[[frog-2]]
+name = "zone-temp-2"
+path = "ABSPATH:1:#frog2_room_sensors/zone_temp_2_tn"
+unit = "F"
+[[frog-2]]
+name = "air-handler"
+path = "ABSPATH:1:#powerscout_frog_2b/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "service-lights"
+path = "ABSPATH:1:#powerscout_frog_2e/n676"
+unit = "kW"
+[[frog-2]]
+name = "building-services"
+path = "ABSPATH:1:#powerscout_frog_2f/n676"
+unit = "kW"
+[[frog-2]]
+name = "ceiling-fans"
+path = "ABSPATH:1:#powerscout_frog_2c/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "chiller"
+path = "ABSPATH:1:#powerscout_frog_2a/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "exterior-lights"
+path = "ABSPATH:1:#powerscout_frog_2f/n670"
+unit = "kW"
+[[frog-2]]
+name = "fire-alarm"
+path = "ABSPATH:1:#powerscout_frog_2e/n679"
+unit = "kW"
+[[frog-2]]
+name = "lutron-lights"
+path = "ABSPATH:1:#powerscout_frog_2e/n670"
+unit = "kW"
+[[frog-2]]
+name = "solar-1"
+path = "ABSPATH:1:#powerscout_frog_2g/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "solar-2"
+path = "ABSPATH:1:#powerscout_frog_2h/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "whole-building"
+path = "ABSPATH:1:#powerscout_frog_2d/elec_demand_tn"
+unit = "kW"
+[[frog-2]]
+name = "window-actuators"
+path = "ABSPATH:1:#powerscout_frog_2f/n679"
+unit = "kW"
+[[frog-2]]
+name = "air-handler"
+path = "ABSPATH:1:#powerscout_frog_2b/n647"
+unit = "kWh"
+[[frog-2]]
+name = "service-lights"
+path = "ABSPATH:1:#powerscout_frog_2e/kwh_b_tn"
+unit = "kWh"
+[[frog-2]]
+name = "building-services-it"
+path = "ABSPATH:1:#powerscout_frog_2f/kwh_b_tn"
+unit = "kWh"
+[[frog-2]]
+name = "ceiling-fans"
+path = "ABSPATH:1:#powerscout_frog_2c/n647"
+unit = "kWh"
+[[frog-2]]
+name = "chiller"
+path = "ABSPATH:1:#powerscout_frog_2a/n647"
+unit = "kWh"
+[[frog-2]]
+name = "exterior-lights"
+path = "ABSPATH:1:#powerscout_frog_2f/kwh_a_tn"
+unit = "kWh"
+[[frog-2]]
+name = "fire-alarm"
+path = "ABSPATH:1:#powerscout_frog_2e/kwh_c_tn"
+unit = "kWh"
+[[frog-2]]
+name = "lutron-lights"
+path = "ABSPATH:1:#powerscout_frog_2e/kwh_a_tn"
+unit = "kWh"
+[[frog-2]]
+name = "solar-1"
+path = "ABSPATH:1:#powerscout_frog_2g/n647"
+unit = "kWh"
+[[frog-2]]
+name = "solar-2"
+path = "ABSPATH:1:#powerscout_frog_2h/n647"
+unit = "kWh"
 [[frog-2]]
 name = "whole-building"
 path = "ABSPATH:1:#powerscout_frog_2d/n647"
 unit = "kWh"
+[[frog-2]]
+name = "window-actuators"
+path = "ABSPATH:1:#powerscout_frog_2f/kwh_c_tn"
+unit = "kWh"
+[[frog-2]]
+name = "light"
+path = "ABSPATH:1:#frog2_room_sensors/light_sensor_1_tn"
+unit = "lux"
+[[frog-2]]
+name = "CO2"
+path = "ABSPATH:1:#frog2_room_sensors/zone_co2_1_tn"
+unit = "ppm"
+[[frog-2]]
+name = "air-handler-avg"
+path = "ABSPATH:1:#powerscout_frog_2b/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "building-services-it-avg"
+path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_b_tn"
+unit = "kW"
+[[frog-2]]
+name = "ceiling-fans-avg"
+path = "ABSPATH:1:#powerscout_frog_2c/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "chiller-avg"
+path = "ABSPATH:1:#powerscout_frog_2a/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "exterior-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_a_tn"
+unit = "kW"
+[[frog-2]]
+name = "fire-alarm-avg"
+path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_c_tn"
+unit = "kW"
+[[frog-2]]
+name = "lutron-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_a_tn"
+unit = "kW"
+[[frog-2]]
+name = "service-lights-avg"
+path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_b_tn"
+unit = "kW"
+[[frog-2]]
+name = "solar-1-avg"
+path = "ABSPATH:1:#powerscout_frog_2g/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "solar-2-avg"
+path = "ABSPATH:1:#powerscout_frog_2h/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "whole-building-avg"
+path = "ABSPATH:1:#powerscout_frog_2d/kw_avg_tn"
+unit = "kW"
+[[frog-2]]
+name = "window-actuators-avg"
+path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_c_tn"
+unit = "kW"
+[[frog-2]]
+name = "zone-humidity-3"
+path = "ABSPATH:1:#frog2_room_sensors/zone_humidity_3_tn"
+actv = false
+unit = "%"
+[[frog-2]]
+name = "zone-temp-3"
+path = "ABSPATH:1:#frog2_room_sensors/zone_temp_3_tn"
+actv = false
+unit = "F"
+[[frog-2]]
+name = "dry-bulb-temp"
+path = "ABSPATH:1:#frog2_room_sensors/zone_temp"
+actv = false
+unit = "F"
+[[frog-2]]
+name = "humidity"
+path = "ABSPATH:1:#frog2_room_sensors/zone_humidity"
+actv = false
+unit = "%"
+
+# Weather Station
+[[weather-station]]
+name = "humidity"
+path = "ABSPATH:1:#netzero_weather_conditions/oa_humidty_tn"
+unit = "%"
+[[weather-station]]
+name = "dry-bulb-temp"
+path = "ABSPATH:1:#netzero_weather_conditions/oa_temp_tn"
+unit = "C"
+[[weather-station]]
+name = "dewpoint"
+path = "ABSPATH:1:#netzero_weather_conditions/dewpoint_tn"
+unit = "C"
+[[weather-station]]
+name = "wind-direction"
+path = "ABSPATH:1:#netzero_weather_conditions/wind_dir_tn"
+unit = "deg"
+[[weather-station]]
+name = "barometric-pressure"
+path = "ABSPATH:1:#netzero_weather_conditions/barometer_tn"
+unit = "hPa"
+[[weather-station]]
+name = "wind-speed"
+path = "ABSPATH:1:#netzero_weather_conditions/wind_spd_tn"
+unit = "m/s"
+[[weather-station]]
+name = "solar-radiation"
+path = "ABSPATH:1:#netzero_weather_conditions/pyrano_tn"
+unit = "wm-2"
