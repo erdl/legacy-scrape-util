@@ -1,2 +1,7 @@
 [general]
 is-active = false
+database = "frog_uhm"
+table = "reading"
+
+[conversions]
+datetime = "to-timestamp"
