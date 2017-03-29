@@ -41,6 +41,7 @@ building-services-it = 56
 air-handler = 54
 lutron-lights-avg = 92
 ceiling-fans = 57
+other-avg = 98
 
 [sensor.frog-2]
 fire-alarm-avg = 104
@@ -82,6 +83,7 @@ building-services-it = 68
 air-handler = 66
 lutron-lights-avg = 105
 ceiling-fans = 69
+other-avg = 111
 
 [sensor.weather-station]
 wind-direction = 12

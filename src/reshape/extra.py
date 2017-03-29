@@ -20,6 +20,7 @@ def add_fields(config,data):
         if not field['type'] in GENERATORS:
             raise Exception('unsupported field type: '.format(field['type']))
         generate = GENERATORS[field['type']]
+        if 'config' in field: field = field['config']
         data = generate(field,data)
     return data
 

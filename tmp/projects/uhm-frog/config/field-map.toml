@@ -1,11 +1,15 @@
-[sensor]
-name = "sensor_id"
-slot = 0
-
 [timestamp]
 name = "datetime"
+slot = 0
+
+[sensor]
+name = "purpose_id"
 slot = 1
 
-[value]
-name = "value"
+[unit]
+name = "units"
 slot = 2
+
+[value]
+name = "reading"
+slot = 3

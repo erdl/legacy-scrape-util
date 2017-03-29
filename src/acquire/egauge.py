@@ -14,6 +14,7 @@ def scrape(project,config,state):
     for gid in gauges:
         print('querying gauge: {}...'.format(gid))
         raw = query(gauges[gid],nonce[gid])
+        if not raw: continue
         rows = fmt_query(gid,raw)
         if not rows: continue
         fltr = lambda r: r.timestamp
@@ -58,8 +59,9 @@ def query(gauge,after):
     # break up the recieved csv into two-dimensional list structure.
     rows = [[y for y in x.split(',')] for x in r.text.splitlines()]
     if not rows: return {}
-    headers = [x.replace('"','') for x in rows.pop(0)]
+    headers = [h.replace('"','') for h in rows.pop(0)]
     columns = list(zip(*rows))
+    if not columns: return {}
     # reshape columns into form { header : [ values ] }
     return {h: list(map(float,columns[i])) for i,h in enumerate(headers)}
 

@@ -3,10 +3,17 @@ type = "webctrl"
 sensor-file = "sensor-map"
 server-file = "server-info"
 
+[[acquire.extra]]
+type = "calculated-row"
+config-file = "calc-map"
+
 [reshape]
-field-file = "field-map"
 value-file = "value-map"
-extra = false
+field-file = "field-map"
+
+[[reshape.extra]]
+type = "current-time"
+name = "upload_timestamp"
 
 [export]
 csv = true

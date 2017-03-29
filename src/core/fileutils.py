@@ -51,6 +51,11 @@ def expand(config,directory,files):
         if isinstance(config[key],dict):
             config[key] = expand(config[key],directory,files)
             continue
+        # iteratively expand lists of dicts.
+        if isinstance(config[key],list):
+            for i,item in enumerate(config[key]):
+                if isinstance(item,dict):
+                    config[key][i] = expand(item,directory,files)
         # If key is not of form 'fieldname-file', we're done here.
         if not '-file' in key:
             continue

@@ -2,6 +2,7 @@
 from importlib import import_module
 import src.core.fileutils as fileutils
 import src.core.errlog as errlog
+import src.acquire.extra as ext
 
 # Primary entry point for runtime.
 # The one constant point in a world
@@ -13,7 +14,7 @@ def run(project):
     # check configuration for required fields.
     check_config(project,config)
     # acquire data & updated state values.
-    data,state = acquire_data(project,config,state)
+    data,state = acquire_data(project,config['acquire'],state)
     # reshape the data into the desired form.
     data = reshape_data(project,config,data)
     # push data to one or more destinations.
@@ -46,11 +47,12 @@ def check_config(project,config):
 # Acquire the data via specifid method.
 # Returns data and a new state value.
 def acquire_data(project,config,state):
-    dconf = config['acquire']
     # import & run the specified scraper.
-    scraper = get_util('acquire',dconf['type'])
-    data,state = scraper.scrape(project,dconf,state)
+    scraper = get_util('acquire',config['type'])
+    data,state = scraper.scrape(project,config,state)
     print('rows acquired during scrape: {}'.format(len(data)))
+    if 'extra' in config and data:
+        data,state = ext.extend(config['extra'],state,data)
     return data,state
 
 
