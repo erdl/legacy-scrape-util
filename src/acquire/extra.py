@@ -13,6 +13,7 @@ def extend(config,state,data):
         generator = EXTENSIONS[exconf['type']]
         state,rows = generator(exconf,state,data)
         print('{} data points generated of type: {}'.format(len(rows),exconf['type']))
+        for r in rows: print(r) # DEBUG
         data += rows
     return data,state
 
@@ -27,9 +28,13 @@ def generate_rows(config,state,data):
     else: sublist = []
     timesort,state = sort_time_points(config,state,addlist,sublist)
     rows = []
+    roundto = 2
+    if 'modify' in config:
+        if 'round' in config['modify']:
+            roundto = config['modify']['round']
     for tindex in timesort:
         value = sum(timesort[tindex]['add']) - sum(timesort[tindex]['sub'])
-        rows.append(mkrow(float(tindex),value))
+        rows.append(mkrow(float(tindex),round(value,roundto)))
     return state,rows
 
 def sort_time_points(config,state,addlist,sublist):
@@ -115,18 +120,35 @@ def assemble_rows(mapping,data):
 def filter_rows(mapping,data,exclude=False):
     fields = list(Row._fields)
     filtered = data
-    start = lambda s,t: s.startswith(t)
-    end = lambda s,t: s.endswith(t)
+
     for field in mapping:
         if not field in fields:
             raise Exception('unrecognized field: {}'.format(field))
         index = fields.index(field)
         target = mapping[field]
-        if start(target,'*') and end(target,'*'): fltr = lambda i,r: target[1:-1] in r[i]
-        elif start(target,'*'): fltr = lambda i,r: end(r[i],target[1:])
-        elif end(target,'*'): fltr = lambda i,r: start(r[i],target[:-1])
-        else: fltr = lambda i,r: r[i] == target
-        filtered = list(filter(lambda r: fltr(index,r),filtered))
+        if isinstance(target,list):
+            aggregator = []
+            for t in target:
+                aggregator += keyword_filter(index,t,filtered)
+            filtered = []
+            for r in aggregator:
+                if not r in filtered: filtered.append(r)
+        else:
+            filtered = keyword_filter(index,target,filtered)
     if exclude: matches = [r for r in data if not r in filtered]
     else: matches = filtered
     return matches
+
+def keyword_filter(index,target,data):
+    start = lambda s,t: s.startswith(t)
+    end = lambda s,t: s.endswith(t)
+    # generate filtering lambda
+    if start(target,'*') and end(target,'*'):
+        fltr = lambda r: target[1:-1] in r[index]
+    elif start(target,'*'):
+        fltr = lambda r: end(r[index],target[1:])
+    elif end(target,'*'):
+        fltr = lambda r: start(r[index],target[:-1])
+    else:
+        fltr = lambda r: r[index] == target
+    return list(filter(fltr,data))

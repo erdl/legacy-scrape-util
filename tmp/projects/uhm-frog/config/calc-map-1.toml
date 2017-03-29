@@ -1,0 +1,24 @@
+[data-point]
+node = "frog-1"
+sensor = "other-avg"
+unit = "kW"
+
+[expect]
+add-count = 1
+sub-count = 9
+
+[modify]
+round = 2
+
+[add.include]
+node = "frog-1"
+unit = "kW"
+sensor = "whole-building-avg"
+
+[sub.include]
+node = "frog-1"
+unit = "kW"
+sensor = "*-avg"
+
+[sub.exclude]
+sensor = [ "whole-building-avg", "*solar*" ]
