@@ -15,9 +15,7 @@ def export(data,project,config):
     # default is just standard psycopg2 formatting...
     else: ins = ','.join(['%s'] * len(fields))
     cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)
-    errs,errtxt,dupcount = exec_push(data,cmd,db)
-    if dupcount:
-        print('duplicate rows ignored: ',dupcount)
+    errs,errtxt = exec_push(data,cmd,db)
     # save any rows which raised unexpexted errors
     # to a csv with prefix `psqlerr`.
     if errs: errdata(project,data,txt='psqlerr')
@@ -25,40 +23,9 @@ def export(data,project,config):
     # the project's main error log.
     for err in errtxt: mklog(project,err)
 
-def exec_push(data,cmd,db):
-    errs,errtxt = [],[]
-    duplicates = 0
-    errcount = 0
-    with psql.connect(database=db) as con:
-        con.set_session(autocommit=True)
-        for i in range(len(data)):
-            row = data.pop(0)
-            try:
-                with con.cursor() as cur:
-                    cur.execute(cmd,row)
-            except Exception as err:
-                if 'duplicate key' in str(err):
-                    dupcount += 1
-                    break
-                else:
-                    errs.append(row)
-                    errtxt.append(err)
-                    errcount += 1
-                    if errcount > 10:
-                        errs += data
-                        errtxt.append("stopping upload attempts")
-                        data = []
-                        break
-    if data:
-        e,t,d = exec_push(data,cmd,db)
-        errs += e
-        errtxt += t
-        duplicates += d
-    return errs,errtxt,duplicates
-
 
 # Actually push the stuff
-def exec_push_old(data,cmd,db):
+def exec_push(data,cmd,db):
     errs,errtxt = [],[]
     dupcount = 0
     print('pushing {} rows to database: {}'.format(len(data),db))
@@ -66,7 +33,7 @@ def exec_push_old(data,cmd,db):
         # activate autocommit so duplicate rows
         # don't kill the entire uplaod proecess.
         con.set_session(autocommit=True)
-        for index,row in enumerate(data):
+        for row in data:
             try:
                 # cursor context manager handles cursor
                 # related cleanup on exception; kinda slow to
@@ -79,15 +46,13 @@ def exec_push_old(data,cmd,db):
                 # from partial uplaod, loss of nonce file, etc...
                 if 'duplicate key' in str(err):
                     dupcount += 1
-                    data = data[index-1:]
-
-
                 else:
                     errs.append(row)
                     errtxt.append(err)
     con.close()
-    return errs,errtxt,dupcount
-
+    if dupcount:
+        print('{} duplicate rows ignored'.format(dupcount))
+    return errs,errtxt
 
 
 # Generate a custom insertion string.
