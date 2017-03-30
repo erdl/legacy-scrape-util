@@ -1,11 +1,85 @@
 # scrape-util
 
-## Gameplan
+## About
 
-This whole 'make a new suite for every sensor scraping task'
-thing is getting out of hand.  We need one clear and concise
-application that handles it all, with configurable features
-and a modular architecture.  We have the technology!
+This application aims to provide a unified and simple method of
+moving and reshaping sensor data.  It is being developed for
+use in environmental research labs, but its potential
+applications are broad.  The core of the project focuses around
+human-readable configuration files which allow the end user
+to describe a wide range of data acquisition, reshaping, and
+uploading/storage actions.
+
+Internally, this application consists of a series of small functional-style
+components which make it easy to provide powerful configuration options,
+and allow for the quick and simple addition of new features as the need
+arises.
+
+## Quick Start
+-----
+This section walks though a minimal example of using the application.
+It is not necessary for comprehension, but it is highly recommended.
+-----
+The quickest way to get started using this application is to run
+through an example project.  You can have any number of projects,
+each with their own configuration options and persistent
+state.  All projects live in [`tmp/projects/`](./tmp/projects/).  
+At a bare minimum, a project needs a configuration file, and
+a file which stored current state (`config.toml` and `state.toml`
+respectively).
+
+If we want to start a project called `room-sensors`, we just
+create a directory named `room-sensors` in our projects folder,
+and place our configuration and state files inside it.  The state
+file is technically optional, but it is recommended that a state
+file be initialized with this boilerplate:
+
+```toml
+[project]
+is-active = false
+```
+
+This tells the program that we are still working on our project,
+and it shouldn't be run yet.  Now that this is taken care of, lets
+make a basic configuration file for our project.  The configuration
+file has two mandatory sections, `acquire` and `export`.  This
+tells the program where to get the data from, and where to put it.
+Each acquisition section must, at a minimum, contain a `type` field.
+This tells the program what kind of acquisition step to run.  All
+additional fields are implementation specific.  For this example,
+we will scrape sensor data from the egauge API, and save it
+to a csv file.  Take a look:
+
+```toml
+[acquire]
+type = "egauge"
+
+[acquire.gauges]
+some-gauge = 1234
+
+
+[export]
+csv = true
+```
+
+As we can see, the egauge implementation requires one additional
+field; the `gauges` field.  This is added as a sub-section of
+`acquire`, and can contain any number of key-value pairs consisting
+of a gauge's name and id number.
+
+The `export` section works somewhat differently than the `acquire`
+section.  Unlike during acquisition, any number of export methods
+can be specified, and the acquired data will be passed to all of them.
+Since the `csv` export method does not have any required configurations,
+we can simply flag it as `true` and it will be run.
+
+
+
+------
+rewrite in progress...
+
+sections below are not yet rewritten.
+------
 
 ## Ideas/Notes
 
@@ -106,7 +180,7 @@ be quite simple as well:
 type = "egauge"
 
 [acquire.gauges]
-some-gauge-id = 0 
+some-gauge-id = 0
 
 [export]
 csv = true

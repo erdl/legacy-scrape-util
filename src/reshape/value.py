@@ -23,6 +23,8 @@ def exec_mapping(data,config):
         mappings,settings = split_config(config[field])
         if 'sub-map' in settings:
             vals,errs,ign = sub_map(data,field,mappings,settings)
+        elif 'concat-map' in settings:
+            vals,errs,ign = concat_map(data,field,mappings,settings)
         else:
             vals,errs,ign = map_field(data,field,mappings,settings)
         errors += errs
@@ -31,6 +33,32 @@ def exec_mapping(data,config):
     assert rowcount == sum((ignores,len(errors),len(data)))
     print('rows ignored during remapping: {}'.format(ignores))
     return data,errors
+
+def concat_map(data,field,mappings,settings):
+    fields = list(Row._fields)
+    concats = settings['concat-map']
+    if 'ignores' in settings:
+        ignores = settings['ignores']
+    else: ignores = []
+    findex = fields.index(field)
+    cindexes = []
+    for cfield in concats:
+        if not cfield in fields:
+            raise Exception('unrecognized field: ',cfield)
+        cindexes.append(fields.index(cfield))
+    fmt = lambda r: '-'.join((r[n] for n in cindexes)).lower()
+    mapped,maperr,igncount = [],[],0
+    for row in data:
+        key = fmt(row)
+        if key in mappings:
+            values = list(row)
+            values[findex] = mappings[key]
+            mapped.append(Row(*values))
+        elif key in ignores:
+            igncount += 1
+        else:
+            maperr.append(row)
+    return mapped,maperr,igncount
 
 # Recursively generate mapping with
 # multiple field dependencies.
@@ -104,7 +132,7 @@ def split_config(config):
     if 'map' in config and 'set' in config:
         return fmt(config['map']),config['set']
     settings = {}
-    setfields = ['ignores','sub-map']
+    setfields = ['ignores','sub-map','concat-map']
     for field in setfields:
         matches = sorted((k for k in config if k.endswith(field)))
         if not matches: continue

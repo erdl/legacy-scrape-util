@@ -1,42 +1,85 @@
 #!/usr/bin/env python3
 from src.core.row import Row
 
+# The `extra` feature of the data-acquisition
+# step is designed for use in generating additional
+# data-points based upon the data-points acquired
+# during primary data-acquisition.  This is distinct
+# from the `extra` feature of the data-reshaping step
+# which is designed to allow for the generation
+# of additional fields.  This helps us maintain
+# interoperability between steps, by keeping clear
+# distinctions between the responsibilities and expectatios
+# that a given step has toward the broader workflow.
+
 EXTENSIONS = {
     'calculated-row' : lambda c,s,d: generate_rows(c,s,d)
 }
 
 # primary entry point for `extra`.
 def extend(config,state,data):
+    # Expects config to be a list of independent
+    # configurations.  Each configuration must at
+    # a minimum implement a `type` field, corresponding
+    # to one of the possible generators in `EXTENSIONS`.
     for exconf in config:
         if not exconf['type'] in EXTENSIONS:
             raise Exception('unrecognized data-extension type: {}'.format(exconf['type']))
         generator = EXTENSIONS[exconf['type']]
+        # All generators must execpt the args (config,state,data),
+        # and return a new instance of `state`, as well as any
+        # additional rows which were generated.
         state,rows = generator(exconf,state,data)
         print('{} data points generated of type: {}'.format(len(rows),exconf['type']))
-        for r in rows: print(r) # DEBUG
+        # Newly generated rows are added immediately to data.
+        # This allows for later generations to integrate the
+        # outputs of earlier generations.
         data += rows
+    # Returns new instances of data & state, with all
+    # all modifications included.
     return data,state
 
+# Generates one or more calculated rows, by matching
+# on a series of field arguments, splitting all matches
+# by timestamp, and adding/subtracting the content
+# of the `value` fields.
 def generate_rows(config,state,data):
+    # Since the mappings for this feature can be quite complex,
+    # we support the ability of the user to shunt the mappings
+    # into a `config-file` field, which is expanded to `config`
+    # when the main configuration file is loaded.
     if 'config' in config: config = config['config']
     dpc = config['data-point']
+    # The newly generated row must have its `node` and `sensor`
+    # values defined, but it can optionally omit units.
     if not 'unit' in dpc: dpc['unit'] = 'undefined'
     mkrow = lambda t,v: Row(dpc['node'],dpc['sensor'],dpc['unit'],t,v)
+    # The new data point must specify one or more targets which
+    # are added to produce its value, and may optionally
+    # define one or more targets to be subtracted as well.
     addlist = assemble_rows(config['add'],data)
     if 'sub' in config:
         sublist = assemble_rows(config['sub'],data)
     else: sublist = []
+    # All adds and subs are sorted by time index, with
+    # any apparently incomplete time indexes added to
+    # the state variable under the assumption that their
+    # remaining values will appear next run.
     timesort,state = sort_time_points(config,state,addlist,sublist)
     rows = []
     roundto = 2
     if 'modify' in config:
         if 'round' in config['modify']:
             roundto = config['modify']['round']
+    # iteratively generate the data-point for each time index.
     for tindex in timesort:
         value = sum(timesort[tindex]['add']) - sum(timesort[tindex]['sub'])
         rows.append(mkrow(float(tindex),round(value,roundto)))
     return state,rows
 
+# Sorts the data-points to be added and subtracted
+# by their time indexes.  Incomplete indexes have
+# their values saved to the `state` variable.
 def sort_time_points(config,state,addlist,sublist):
     partials,state = extract_partials(config,state)
     timesort = {}
@@ -73,7 +116,10 @@ def sort_time_points(config,state,addlist,sublist):
         state = merge_partials(config,state,newpartials)
     return timesort,state
 
-
+# Removes any partial time indexes corresponding to
+# the current data-point generation from the `state`
+# variable.  For conciceness, this is achieved by hashing
+# the sensor and node values for the data-point.
 def extract_partials(config,state):
     if not 'calculated-row' in state: return {},state
     if not 'partials' in state['calculated-row']:
@@ -90,6 +136,9 @@ def extract_partials(config,state):
         del state['calculated-row']
     return extract,state
 
+# Merge any outstanding partial time indexes into
+# the state variable for completion on the next
+# iteration of the program. 
 def merge_partials(config,state,partials):
     node = config['data-point']['node']
     sensor = config['data-point']['sensor']
