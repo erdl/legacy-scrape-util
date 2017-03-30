@@ -6,3 +6,7 @@ table = "reading"
 [conversions]
 datetime = "to-timestamp"
 upload_timestamp = "to-timestamp"
+
+[filter]
+time-index = 
+unique-key = ["datetime","purpose_id"]
