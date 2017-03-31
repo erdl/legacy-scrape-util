@@ -25,7 +25,11 @@ def export(data,project,config):
     # the project's main error log.
     for err in errtxt: mklog(project,err)
 
-
+# Controller for the actual push attempt.
+# Forces all rows to be attempted at least once.
+# This is a workaround for the fact that psql,
+# until recently, will invalidate entire transaction
+# blocks if too many duplacates are encountered.
 def handle_push(data,cmd,db):
     duplicates = 0
     errs,errtxt = [],[]
@@ -36,7 +40,9 @@ def handle_push(data,cmd,db):
         if txt: errtxt.append(txt)
     return errs,errtxt,duplicates
 
-
+# Attempts to push rows to db.  Removes rows
+# from data as they are pushed.  Halts & returns
+# remaining rows upon first exception.
 def push_rows(data,cmd,db):
     duplicate = False
     error = None
@@ -58,7 +64,7 @@ def push_rows(data,cmd,db):
     con.close()
     return data,duplicate,error,text
 
-
+'''
 # Actually push the stuff
 def exec_push(data,cmd,db):
     errs,errtxt = [],[]
@@ -88,7 +94,7 @@ def exec_push(data,cmd,db):
     if dupcount:
         print('{} duplicate rows ignored'.format(dupcount))
     return errs,errtxt
-
+'''
 
 
 # Generate a custom insertion string.
