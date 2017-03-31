@@ -33,8 +33,10 @@ def export(data,project,config):
 def handle_push(data,cmd,db):
     duplicates = 0
     errs,errtxt = [],[]
-    while len(data) > 0:
-        data,dup,err,txt = push_rows(data,cmd,db)
+    # gotta copy `data` to avoid side-effects.
+    rows = [r for r in data]
+    while len(rows) > 0:
+        rows,dup,err,txt = push_rows(rows,cmd,db)
         if dup: duplicates += 1
         if err: errs.append(err)
         if txt: errtxt.append(txt)
@@ -63,38 +65,6 @@ def push_rows(data,cmd,db):
                 break
     con.close()
     return data,duplicate,error,text
-
-'''
-# Actually push the stuff
-def exec_push(data,cmd,db):
-    errs,errtxt = [],[]
-    dupcount = 0
-    print('pushing {} rows to database: {}'.format(len(data),db))
-    with psql.connect(database=db) as con:
-        # activate autocommit so duplicate rows
-        # don't kill the entire uplaod proecess.
-        con.set_session(autocommit=True)
-        for row in data:
-            try:
-                # cursor context manager handles cursor
-                # related cleanup on exception; kinda slow to
-                # use an individual cursor for each row, but
-                # necessary when duplicate data is an issue.
-                with con.cursor() as cur:
-                    cur.execute(cmd,row)
-            except Exception as err:
-                # duplicate key errors are ignored to facilitate recovery
-                # from partial uplaod, loss of nonce file, etc...
-                if 'duplicate key' in str(err):
-                    dupcount += 1
-                else:
-                    errs.append(row)
-                    errtxt.append(err)
-    con.close()
-    if dupcount:
-        print('{} duplicate rows ignored'.format(dupcount))
-    return errs,errtxt
-'''
 
 
 # Generate a custom insertion string.

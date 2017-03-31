@@ -90,6 +90,8 @@ def sort_time_points(config,state,addlist,sublist):
         timesort[tindex]['add'].append(r.value)
     for r in sublist:
         tindex = str(r.timestamp)
+        if not tindex in timesort:
+            timesort[tindex] = {'add': [], 'sub': []}
         timesort[tindex]['sub'].append(r.value)
     for t in timesort:
         if t in partials:
@@ -138,7 +140,7 @@ def extract_partials(config,state):
 
 # Merge any outstanding partial time indexes into
 # the state variable for completion on the next
-# iteration of the program. 
+# iteration of the program.
 def merge_partials(config,state,partials):
     node = config['data-point']['node']
     sensor = config['data-point']['sensor']
