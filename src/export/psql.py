@@ -15,6 +15,7 @@ def export(data,project,config):
     # default is just standard psycopg2 formatting...
     else: ins = ','.join(['%s'] * len(fields))
     cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)
+    print('pushing {} rows to psql...'.format(len(data)))
     errors,errtxt,duplicates = handle_push(data,cmd,db)
     if duplicates:
         print('duplicate rows ignored: ',len(duplicates))
@@ -48,7 +49,7 @@ def handle_push(data,cmd,db):
         ignored += igns
         if err: errors.append(err)
         if txt: errtxt.append(txt)
-    assert rowtotal == sum(len(errors),len(ignored),len(uploaded))
+    assert rowtotal == sum((len(errors),len(ignored),len(uploaded)))
     return errors,errtxt,ignored
 
 # Attempts to push rows to db.  Removes rows
