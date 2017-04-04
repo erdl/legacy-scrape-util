@@ -1,0 +1,45 @@
+# CONFIGURATION
+# This is the main configuration file of
+# the project; any additional configuration
+# files are only loaded if they are linked
+# to this file by a `-file` argument specifying
+# the file to be loaded.
+
+# ACQUIRE
+# The acquire step is defined below;
+# the `type` field is the only argument
+# that is required by all acquisition
+# methods. Additional arguments are defined
+# by the specific implementation.
+
+[acquire]
+
+type = "some-acquire-type"
+
+
+# RESHAPE
+# The reshape field optionally defines
+# one or more reshaping actions to be
+# applied to the acquired dataset.
+# This field may be left blank or omitted
+# entirely if no reshaping is desired. 
+
+[reshape]
+# ...some-reshape-declaration...
+
+
+# EXPORT
+# The export section defines one or more
+# destinations for the the acquired
+# data-points. By convention, the `csv`
+# export method is kept active to ensure
+# that no data is lost if one of the more
+# complex export implementations is
+# not properly configured.
+
+[export]
+
+csv = true
+
+# ...some-export-declaration...
+

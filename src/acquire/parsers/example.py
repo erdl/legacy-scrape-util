@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.row import Row
+from src.core.utils import Row
 
 # list required configuration fields
 REQUIRE = []

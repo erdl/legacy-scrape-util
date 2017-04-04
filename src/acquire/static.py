@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from importlib import import_module
-from src.core.row import Row
+from src.core.utils import Row
 import os.path as path
 import os
 

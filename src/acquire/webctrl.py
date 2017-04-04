@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-from src.core.row import Row
+from src.core.utils import Row, mkuid
 import requests
 import time
-
 
 # Primary entry point for webctrl scrape.
 # Returns data & updated state.
@@ -22,13 +21,14 @@ def scrape(project,config,state):
             name = sensor['name']
             path = sensor['path']
             unit = sensor['unit'] if 'unit' in sensor else 'undefined'
-            after = nonce[node][name]
+            code = mkuid(node,name,unit)
+            after = nonce[code]
             result = query(path,after)
             lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
             rows = [lrow(r['t'],r['a']) for r in result if not '?' in r.values()]
             if not rows: continue
             fltr = lambda r: r.timestamp
-            nonce[node][name] = max(rows,key=fltr).timestamp
+            nonce[code] = max(rows,key=fltr).timestamp
             data += rows
     state['nonce'] = nonce
     if not 'nonce-file' in state:
@@ -54,12 +54,12 @@ def check_nonce(nonce,sensor_map,delta=None):
     if not delta:
         delta = time.time() - 86400
     for node in sensor_map:
-        sensors = sensor_map[node]
-        if not node in nonce:
-            nonce[node] = {}
-        for s in sensors:
-            if s['name'] not in nonce[node]:
-                nonce[node][s['name']] = delta
+        for sensor in sensor_map[node]:
+            name = sensor['name']
+            unit = sensor['unit']
+            code = mkuid(node,name,unit)
+            if not code in nonce:
+                nonce[code] = delta
     return nonce
 
 # Generate a pre-configured query callable

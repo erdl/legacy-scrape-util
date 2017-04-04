@@ -1,0 +1,14 @@
+# STATE FILE
+# This is the primary file by which state
+# may be maintained between executions of a
+# given project.  As a general rule; the state
+# file does not need to be user-configured,
+# with the one exception being the `is-active`
+# field.  This field dictates wether a project
+# is ready to be run, and should be changed
+# to `true` once all configuration files
+# have been set up.
+
+[general]
+
+is-active = false
