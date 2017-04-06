@@ -13,7 +13,6 @@
 # by the specific implementation.
 
 [acquire]
-
 type = "some-acquire-type"
 
 
@@ -22,7 +21,7 @@ type = "some-acquire-type"
 # one or more reshaping actions to be
 # applied to the acquired dataset.
 # This field may be left blank or omitted
-# entirely if no reshaping is desired. 
+# entirely if no reshaping is desired.
 
 [reshape]
 # ...some-reshape-declaration...
@@ -38,8 +37,6 @@ type = "some-acquire-type"
 # not properly configured.
 
 [export]
-
 csv = true
 
 # ...some-export-declaration...
-

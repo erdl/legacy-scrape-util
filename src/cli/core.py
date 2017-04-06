@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import argparse as ap
+import shutil
+import os
 
 
 def run():
     args = get_args()
-    print('project-name: ',args.projectname)
+    projdir = mktemplate(args.projectname)
     if args.acquire:
-        print('acquire step: ',args.acquire)
-    if args.reshape:
-        print('reshape step(s): ',args.reshape)
-    if args.export:
-        print('export step(s): ',args.export)
+        generate_acquire_step(projdir,args.acquire)
+    print('project template generated at: ',projdir)
 
 
 def get_args():
@@ -22,15 +21,36 @@ def get_args():
     # optional single-value arguemnt defining acquire step.
     parser.add_argument('-a','--acquire',
         help='acquire step to use',type=str)
-    # optional mulit-value argument defining reshape step.
-    parser.add_argument('-r','--reshape',
-        help='reshape step to use',type=str,nargs='+')
-    # optional multi-value argument defining export step.
-    parser.add_argument('-e','--export',
-        help='export step to use',type=str,nargs='+')
     return parser.parse_args()
 
 
+def generate_acquire_step(projdir,steptype):
+    src = 'src/cli/templates/acquire/'
+    dst = '{}config/'.format(projdir)
+    templates = [f for f in os.listdir(src) if f.endswith('-config.toml')]
+    targets = [f for f in templates if f.startswith(steptype)]
+    if not targets:
+        raise Exception('no template found for: ' + steptype)
+    target = targets.pop(0)
+    tname = '.'.join(target.split('.')[:-1])
+    shutil.copy(src + target,dst + target)
+    with open(dst + 'config-core.toml') as fp:
+        clines = fp.read().splitlines()
+    for i,line in enumerate(clines):
+        if line.startswith('type = '):
+            clines[i] = 'type = "{}"'.format(steptype)
+            clines.insert(i+1,'config-file = "{}"'.format(tname))
+            break
+    with open(dst + 'config-core.toml','w') as fp:
+        for line in clines:
+            print(line,file=fp)
+
+
+def mktemplate(projname):
+    src = 'src/cli/templates/project'
+    dst = 'tmp/projects/{}/'.format(projname)
+    shutil.copytree(src,dst)
+    return dst
 
 
 

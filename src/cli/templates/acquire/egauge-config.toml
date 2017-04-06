@@ -1,0 +1,6 @@
+# Configuration file for eGauge API scrape.
+# All gauge declarations should be in the
+# form of `gauge-id = gaugeNumber`.
+
+[gauges]
+# some-gauge = 123
