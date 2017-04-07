@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.utils import Row
+from src.core.data_utils import Row
 import requests
 import time
 

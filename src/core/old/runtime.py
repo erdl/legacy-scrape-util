@@ -1,55 +1,13 @@
 #!/usr/bin/env python3
 from importlib import import_module
-import src.core.file_utils as file_utils
-import src.core.error_utils as error_utils
-import src.core.cli_utils as cli_utils
+import src.core.fileutils as fileutils
+import src.core.errlog as errlog
+import src.acquire.extra as ext
 
-def run(mode='cli'):
-    if mode == 'cli':
-        run_cli()
-    else:
-        raise Exception('unrecognized mode: ' + mode)
-    print('program closing...')
-
-def run_cli():
-    config = cli_utils.run_cli()
-    active,inactive = sort_projects(config)
-    if inactive:
-        print('skipping project(s):')
-        print(inactive.keys())
-        print('(flagged as inactive in master config)\n')
-    if not active:
-        print('no active projects found...')
-        return
-    for project in active:
-        run_wrapped(project)
-
-# Split project from master-config into
-# active and inactive sub-configurations.
-def sort_projects(config):
-    active = {}
-    inactive = {}
-    for project in config:
-        projconf = config[project]
-        if 'is-active' in projconf:
-            if not projconf['is-active']:
-                inactive[project] = projconf
-        else: active[project] = projconf
-    return active,inactive
-
-# wrapper around `run project` which
-# catches & logs errors.
-def run_wrapped(project):
-    try:
-        run_project(project)
-    except Exception as err:
-        print('exception in {}:'.format(project))
-        print(str(err) + '\n')
-        error_utils.mklog(project,err)
-
-# Handles an atomic project-run instance.
-# can be called manually with project name.
-def run_project(project):
+# Primary entry point for runtime.
+# The one constant point in a world
+# that is rife with uncertainty.
+def run(project):
     # extract conigurationa and state
     # from the appropriate project file.
     config,state = get_parameters(project)
@@ -57,8 +15,6 @@ def run_project(project):
     check_config(project,config)
     # acquire data & updated state values.
     data,state = acquire_data(project,config['acquire'],state)
-    # add any generated rows.
-    #data += generate_rows(data,state,config)
     # reshape the data into the desired form.
     data = reshape_data(project,config,data)
     # push data to one or more destinations.
@@ -84,27 +40,15 @@ def update_state(project,state):
 # Check config file for existence
 # of any required fields.
 def check_config(project,config):
-    msg = 'no {} section defined for {}.'
+    msg = 'no {} method defined for {}.'
     require = ['acquire','export']
     for req in require:
         if not req in config:
-            raise Exception(msg.format(req,project))
+            raise Exception(msg.format(req,config))
 
 # Acquire the data via specifid method.
 # Returns data and a new state value.
 def acquire_data(project,config,state):
-    data = []
-    for method in config:
-        if not is_active(config[method]):
-            print('skipping acquire method: ',method)
-            print('(flagged as inactive)\n')
-            continue
-        scraper = get_util('acquire',config['type'])
-        rows,state = scraper.scrape(project,config[method],state)
-        data += rows
-    print('{} rows generated during `acquire` step.'.format(len(data)))
-    return data,state
-
     # import & run the specified scraper.
     scraper = get_util('acquire',config['type'])
     data,state = scraper.scrape(project,config,state)
@@ -118,15 +62,15 @@ def acquire_data(project,config,state):
 def reshape_data(project,config,data):
     if not data: return
     if 'reshape' in config:
-        config = config['reshape']
+        rconf = config['reshape']
     else: return data
     rutils = {}
     rord = []
     # assemble list of active reshape mappings.
-    for kind in config:
+    for kind in rconf:
         # ignore file specifiers.
         if 'file' in kind: continue
-        if not isactive(config[kind]): continue
+        if not isactive(rconf[kind]): continue
         rutils[kind] = get_util('reshape',kind)
         rord.append(kind)
     # sort reshape utilites by their ORD variable.
@@ -143,15 +87,15 @@ def export_data(project,config,data):
     if not data:
         print('no values to export.')
         return
-    config = config['export']
+    exconf = config['export']
     # iteratively run configured exports.
-    for kind in config:
+    for kind in exconf:
         # ignore file specifiers.
         if '-file' in kind: continue
-        if not isactive(config[kind]): continue
+        if not isactive(exconf[kind]): continue
         # load & run specified export utility.
         exutil = get_util('export',kind)
-        exutil.export(data,project,config[kind])
+        exutil.export(data,project,exconf[kind])
 
 # Generic 'utility' getter.
 # Attempts to take a category & kind,
@@ -165,7 +109,7 @@ def get_util(category,kind):
 # Check a dictionary for the 'is-active'
 # flag, returning true unless 'is-active'
 # exists and is set to false.
-def is_active(subject):
+def isactive(subject):
     # Check if subject is empty or False.
     if not subject: return False
     # Check if subject is simply the a
@@ -176,7 +120,7 @@ def is_active(subject):
         return True
     # Check for common pattern of miscellaneous
     # configuratinos livin in the `general` field.
-    if 'settings' in subject:
+    if 'general' in subject:
         if not isactive(subject['general']):
             return False
     if 'is-active' in subject:

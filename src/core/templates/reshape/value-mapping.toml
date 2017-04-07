@@ -1,0 +1,22 @@
+# This is a mapping configuration for value based data-reshape.
+
+
+[settings]
+is-active = false
+map-target = "some-field"
+mapping-action = "replace" # optional
+filter-action = "discard"
+
+
+[mappings]
+node1-sensor1-someunit = { sensor = 0 }
+
+
+
+[filters]
+some-data-to-constrain = { min = 0, max = 100000 }
+some-data-to-remove = true
+some-data-to-keep = false # optional
+
+
+[reductions]

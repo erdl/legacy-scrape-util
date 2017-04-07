@@ -1,0 +1,19 @@
+# Configuration file for eGauge API scrape.
+
+
+# The `settings` section is entirely optional
+# for scraping the egauge API.  Config tempalates
+# are automatically instantiated with the the
+# `is-active` field set to `false`.  Once the file
+# has been properly configured, this field may be set
+# to true, or simply deleted.
+[settings]
+is-active = false
+
+# The `gauges` section is required for operation
+# and must contain one or more gauges, declared
+# in the form: `gauge-name = gauge-numer`.
+# Ex: `some-gauge = 123`
+[gauges]
+
+# ...

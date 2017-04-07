@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.errlog import errdata,mklog
+from src.core.error_utils import errdata,mklog
 import psycopg2 as psql
 import time
 

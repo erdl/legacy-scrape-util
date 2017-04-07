@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os.path as path
 import toml
 import json
 import os
@@ -7,10 +8,10 @@ import os
 FILETYPES = ['json','toml']
 
 # Primary entry point for loading files.
-def load_files(directory,targets):
+def load_files(directory,targets,optional=False):
     configs = []
     for target in targets:
-        configs.append(load(directory,target))
+        configs.append(load(directory,target,optional=optional))
     return configs
 
 # primary entry-point for writing configuration files.
@@ -30,15 +31,20 @@ def write_file(directory,target,data,filetype='toml'):
 # Top-level loading function.
 # If directory matching target exists,
 # assumes form dir/target/target-core.something.
-def load(directory,target):
+def load(directory,target,optional=False):
     cdir = directory + target + '/'
     if os.path.isdir(cdir):
         directory = cdir
         target = target + '-core'
     files = list_files(directory)
     fname = get_filename(files,target)
-    fcore = read_file(directory + fname)
-    return expand(fcore,directory,files)
+    if fname:
+        fcore = read_file(directory + fname)
+        return expand(fcore,directory,files)
+    elif optional:
+        return {}
+    else:
+        raise Exception('no file found matching: {}'.format(fstring))
 
 # Recursively expand any '-file' fields.
 def expand(config,directory,files):
@@ -88,11 +94,8 @@ def get_filename(files,fstring):
     check = lambda f: fmt(f) == fstring
     # Compile list of matching files.
     valid = list(filter(check,files))
-    # If no matching files, something has gone horribly horribly wrong!
-    if not valid:
-        raise Exception('no file found matching: {}'.format(fstring))
-    # Return a matching file name.
-    return valid.pop(0)
+    # Return a matching file name if one exists.
+    return valid.pop(0) if valid else None
 
 
 # get all valid files in directory.
@@ -161,6 +164,8 @@ def recursive_write(directory,data,filetype,target=None):
     # and must return our data so as to propogate deleted fields.
     if not target:
         return data
+    if not path.isdir(directory):
+        os.makedirs(directory)
     # write remaining contents of data to target.
     tpath = directory + target + '.' + filetype
     execute_write(tpath,data,filetype)

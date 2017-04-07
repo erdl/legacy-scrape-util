@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from src.core.errlog import errdata
-from src.core.utils import Row
+from src.core.error_utils import errdata
+from src.core.data_utils import Row
 
 # Determines order of application
 # during mulit-phase reshaping process.

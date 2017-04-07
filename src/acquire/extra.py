@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.utils import Row
+from src.core.data_utils import Row
 
 # The `extra` feature of the data-acquisition
 # step is designed for use in generating additional

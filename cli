@@ -1,0 +1,3 @@
+#!/usr/bin/env python3
+from src.cli.core import run
+run()

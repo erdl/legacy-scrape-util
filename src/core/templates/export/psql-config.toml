@@ -1,0 +1,25 @@
+# Configuration file for PSQL based data-export.
+
+# The `settings` section contains the general
+# configurations required for exporting data to
+# a locally hosted PSQL database.  Auto-generated
+# config templates contain the optional `is-active`
+# field set to `false`.  Once all required fields
+# have been filled, this field may either be set
+# to `true`, or simply deleted.
+[settings]
+# Required Fields
+database = "some-db"
+table = "some-table"
+# Optional Fields
+is-active = false # defaults to true.
+save-duplicates = true # defaults to false.
+
+
+# The `conversion` section is optional, and
+# is used to declare type casts/conversions
+# to be included in the query by specifying
+# field-name = "conversion-type".
+# Ex: timestamp = "to-timestamp"
+[conversions]
+# ...

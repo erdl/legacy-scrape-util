@@ -1,0 +1,33 @@
+# Configuration file for webCTRL API scrape.
+
+# The `settings` section must contain login info
+# in the form `login = { name = "uname", pass = "pass" }`,
+# as well as a declaration of the full url exposed
+# by the webctrl bulk-trend server api,
+# Ex: `server = "http://path.to.server/api/"`
+# Templates are instantiated with the `is-active`
+# field set to `false`.  Once the config file has been
+# properly configured, this field may either be
+# set to `true`, or simply deleted.
+[settings]
+is-active = false
+login = { name = "uname", pass = "pass" }
+server = "http://path.to.server/api/"
+
+
+# The `sensor` section may contain any number of sensors
+# with the minimal form being:
+# [[sensors]]
+# name = "sensor-name"
+# path = "path/to/sensor"
+# The fields `node` and `unit` are optional, but
+# highly-reccommended.  If left out, the `node`
+# field will default to the project name, and the
+# unit field will default to `undefined`.
+[[sensors]]
+node = "some-node" # optional
+name = "some-name"
+unit = "some-unit" # optional
+path = "ABSPATH:some/path/to/data/"
+
+# ...

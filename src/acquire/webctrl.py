@@ -1,35 +1,33 @@
 #!/usr/bin/env python3
-from src.core.utils import Row, mkuid
+from src.core.data_utils import Row, mkuid
 import requests
 import time
 
 # Primary entry point for webctrl scrape.
 # Returns data & updated state.
 def scrape(project,config,state):
-    state = check_state(config,state)
+    state = check_state(project,config,state)
     nonce = state['nonce']
-    sensor_map = config['sensor']
+    sensors = config['sensors']
     data = []
-    query = new_query(config['server'])
+    query = new_query(config['settings'])
     # cycle through all nodes, querying
     # all sensors associated with each node.
-    for node in sensor_map:
-        sensors = sensor_map[node]
-        for sensor in sensors:
-            if 'actv' in sensor:
-                if not sensor['actv']: continue
-            name = sensor['name']
-            path = sensor['path']
-            unit = sensor['unit'] if 'unit' in sensor else 'undefined'
-            code = mkuid(node,name,unit)
-            after = nonce[code]
-            result = query(path,after)
-            lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
-            rows = [lrow(r['t'],r['a']) for r in result if not '?' in r.values()]
-            if not rows: continue
-            fltr = lambda r: r.timestamp
-            nonce[code] = max(rows,key=fltr).timestamp
-            data += rows
+    for sensor in sensors:
+        if 'is-active' in sensor:
+            if not sensor['is-active']: continue
+        name,path = sensor['name'], sensor['path']
+        node = sensor['node'] if 'node' in sensor else project
+        unit = sensor['unit'] if 'unit' in sensor else 'undefined'
+        code = mkuid(node,name,unit)
+        after = nonce[code]
+        result = query(path,after)
+        lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
+        rows = [lrow(r['t'],r['a']) for r in result if not '?' in r.values()]
+        if not rows: continue
+        fltr = lambda r: r.timestamp
+        nonce[code] = max(rows,key=fltr).timestamp
+        data += rows
     state['nonce'] = nonce
     if not 'nonce-file' in state:
         state['nonce-file'] = 'nonce'
@@ -37,38 +35,38 @@ def scrape(project,config,state):
 
 
 # check on state, generating any missing values.
-def check_state(config,state):
+def check_state(project,config,state):
     # read & remove init section if found.
     if 'init' in state:
         delta = state['init']['start-from']
         del state['init']
     else: delta = None
-    if not 'nonce' in state: state['nonce'] = {}
-    state['nonce'] = check_nonce(state['nonce'],config['sensor'],delta)
+    nonce = state['nonce'] if 'nonce' in state else {}
+    state['nonce'] = check_nonce(project,config['sensors'],nonce,delta)
     return state
 
 
 # Add a new nonce field for any sensors
 # not found in the nonce.
-def check_nonce(nonce,sensor_map,delta=None):
+def check_nonce(project,sensors,nonce,delta=None):
     if not delta:
         delta = time.time() - 86400
-    for node in sensor_map:
-        for sensor in sensor_map[node]:
-            name = sensor['name']
-            unit = sensor['unit']
-            code = mkuid(node,name,unit)
-            if not code in nonce:
-                nonce[code] = delta
+    for sensor in sensors:
+        node = sensor['node'] if 'node' in sensor else project
+        unit = sensor['unit'] if 'unit' in sensor else 'undefined'
+        name = sensor['name']
+        code = mkuid(node,name,unit)
+        if not code in nonce:
+            nonce[code] = delta
     return nonce
 
 # Generate a pre-configured query callable
 # s.t. we don't all die of excess boilerplate.
-def new_query(server):
+def new_query(settings):
     tp = lambda t: time.strftime('%Y-%m-%d',time.gmtime(t))
     now = time.time()
-    uri = server['query']['uri']
-    auth = ( server['login']['name'], server['login']['pass'] )
+    uri = settings['server']
+    auth = ( settings['login']['name'], settings['login']['pass'] )
     # return a lambda requiring args querystring,nonce
     lam = lambda q,n : exec_query(uri,q,auth,tp(n),tp(now))
     return lam
