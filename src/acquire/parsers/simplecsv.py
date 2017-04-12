@@ -17,7 +17,7 @@ import csv
 REQUIRE = []
 
 # primary entry point.
-def parse(config,filepath):
+def parse(config,state,filepath):
     # get the raw rows from the csv file.
     raw  = readcsv(filepath)
     # parse raw rows into expected format.

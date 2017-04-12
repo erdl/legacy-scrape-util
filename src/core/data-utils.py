@@ -13,6 +13,13 @@ import csv
 # various steps/components ( esp. acquisition & reshaping ).
 Row = namedtuple('row',['node','sensor','unit','timestamp','value'])
 
+def fmt_string(target):
+    target = str(target).strip()
+    elements = [e for e in target.split(' ') if e]
+    formatted = '-'.join(elements).lower()
+    return formatted
+
+
 # make a unique identifuing string from
 # a node, sensor, and unit value.
 def mkuid(node,sensor,unit):

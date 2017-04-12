@@ -62,18 +62,84 @@ def run_generators(project,config,data):
     uidsort = sort_by_uid(data)
     generated = []
     partials = {}
+    rows = []
     for gen in generators:
         gid = uid_from_spec(gen)
         add,sub = [],[]
+        addcount = len(gen['add'])
+        subcount = len(gen['sub'])
         for uid in gen['add']:
             if uid in uidsort:
                 add += uidsort[uid]
         for uid in gen['sub']:
             if uid in uidsort:
-                ##CONTINUE
+                sub += uidsort[uid]
+        tadd = sort_by_timestamp(add)
+        tsub = sort_by_timestamp(sub)
+        completes = {}
+        tindexes = [t for t in tadd] + [t for t in tsub if not t in tadd]
+        for t in tindexes:
+            base = {}
+            base['add'] = tadd[t] if t in tadd else []
+            base['sub'] = tsub[t] if t in tsub else []
+            ac = len(base['add'])
+            sc = len(base['sub'])
+            if ac == addcount and sc == subcount:
+                completes[t] = base
+            else:
+                if not gid in partials:
+                    partials[gid] = {}
+                partials[gid][t] = base
+        for t in completes:
+
+
+        for tindex in completes:
 
 
     return data,errors
+
+
+# Generate one or more new sets of data-points
+# by adding and subtracting `value` fields.
+def run_generators(project,config,data):
+    generators = config['generators']
+    generators = check_generators(project,generators)
+    uidsort = sort_by_uid(data)
+    generated = []
+    partials = {}
+    rows = []
+    for gen in generators:
+        gid = uid_from_spec(gen)
+        acount = len(gen['add'])
+        scount = len(gen['sub'])
+        sort = {} # { timestamp: {action: { uid: value } } }
+        for row in data:
+            uid = du.get_uid(row)
+            if uid in gen['add']:
+                action = 'add'
+            elif uid in gen['sub']:
+                action = 'sub'
+            else: action = None
+            if not action: continue
+            tid = str(row.timestamp)
+            if not tid in sort:
+                sort[tid] = {'add': {}, 'sub': {}}
+            sort[tid][action][uid] = row.value
+        for tid in sort:
+            ac = len(sort[tid]['add'])
+            sc = len(sort[tid]['sub'])
+            if not ac == acount or not sc == scount:
+                if not gid in partials:
+                    partials[gid] = {}
+                partials[gid][tid] = sort[tid]
+            ## CONTINUE
+
+
+        for tindex in completes:
+
+
+    return data,errors
+
 
 
 def check_generators(project,generators):
@@ -98,6 +164,11 @@ def run_mappings(project,config,data):
 
     return data,errors
 
+
+def compress_rows(rows):
+    compressed = {}
+    for row in rows:
+        uid = du.get_uid(row)
 
 
 def sort_by_uid(rows):

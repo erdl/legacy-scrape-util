@@ -14,16 +14,17 @@ def scrape(project,config,state):
         print('no files found at: {}'.format(source))
         return [],{}
     rows,fmts,errs = [],[],[]
-    parse = lambda f: parser.parse(config['parser'],source+f)
+    parse = lambda f: parser.parse(project,config['parser'],state,source+f)
     for f in files:
         try:
-            rows += parse(f)
+            state,r = parse(f)
+            rows += r
             fmts += f
         except Exception as err:
             mklog(project,err)
             errs += f
     move_originals(project,config,source,fmts,errs)
-    return rows,state
+    return state,rows
 
 
 # check that the input directory exists.

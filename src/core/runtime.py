@@ -56,13 +56,13 @@ def run_project(project):
     # check configuration for required fields.
     check_config(project,config)
     # acquire data & updated state values.
-    data,state = acquire_data(project,config['acquire'],state)
+    state,data = acquire_data(project,config['acquire'],state)
     # add any generated rows.
     #data += generate_rows(data,state,config)
     # reshape the data into the desired form.
-    data = reshape_data(project,config,data)
+    state,data = reshape_data(project,config,state,data)
     # push data to one or more destinations.
-    export_data(project,config,data)
+    state = export_data(project,config,state,data)
     # update the state file w/ new values.
     update_state(project,state)
 
@@ -100,22 +100,13 @@ def acquire_data(project,config,state):
             print('(flagged as inactive)\n')
             continue
         scraper = get_util('acquire',config['type'])
-        rows,state = scraper.scrape(project,config[method],state)
+        state,rows = scraper.scrape(project,config[method],state)
         data += rows
     print('{} rows generated during `acquire` step.'.format(len(data)))
-    return data,state
-
-    # import & run the specified scraper.
-    scraper = get_util('acquire',config['type'])
-    data,state = scraper.scrape(project,config,state)
-    print('rows acquired during scrape: {}'.format(len(data)))
-    if 'extra' in config and data:
-        data,state = ext.extend(config['extra'],state,data)
-    return data,state
-
+    return state,data
 
 # Reshape the data via specified mapping(s).
-def reshape_data(project,config,data):
+def reshape_data(project,config,state,data):
     if not data: return
     if 'reshape' in config:
         config = config['reshape']
@@ -134,15 +125,15 @@ def reshape_data(project,config,data):
     rord = sorted(rord,key=skey)
     # run all reshape utilities across data.
     for rs in rord:
-        data = rutils[rs].reshape(project,rconf[rs],data)
-    return data
+        state,data = rutils[rs].reshape(project,rconf[rs],state,data)
+    return state,data
 
 
 # Save the data via specified channel(s).
-def export_data(project,config,data):
+def export_data(project,config,state,data):
     if not data:
         print('no values to export.')
-        return
+        return state
     config = config['export']
     # iteratively run configured exports.
     for kind in config:
@@ -152,6 +143,7 @@ def export_data(project,config,data):
         # load & run specified export utility.
         exutil = get_util('export',kind)
         exutil.export(data,project,config[kind])
+    return state
 
 # Generic 'utility' getter.
 # Attempts to take a category & kind,
