@@ -1,11 +1,20 @@
 # This is a mapping configuration for value based data-reshape.
 
+# Value based reshapings are heavily reliant on the
+# assumtion that each group of related data-points
+# can be reasonably identified as unique by a
+# combination of their `node`, `sensor`, and `unit`
+# values.  Ex: all data-points with `node=apples`,
+# `sensor=oranges`, and `unit=carrots` can be
+# acted upon as a singular group.
+
 
 [settings]
 is-active = false
 map-target = "some-field"
-mapping-action = "replace" # optional
-filter-action = "discard"
+on-mapping = "discard" # defaults to "discard"
+on-filter = "discard" # possibilities: discard, archive
+in-order = ["filters","mappings","generators"]
 
 
 [mappings]
@@ -19,4 +28,16 @@ some-data-to-remove = true
 some-data-to-keep = false # optional
 
 
-[reductions]
+[[generators]]
+node = "some-node"
+name = "some-name"
+unit = "some-unit"
+add = ["some-data-point-1","some-data-point-2"]
+sub = ["some-data-point-3"]
+
+[[generators]]
+node = "some-other-node"
+name = "some-other-name"
+unit = "some-other-unit"
+add = { node = "some-node",unit = "some-unit" }
+sub = ["some-specific-data-point"]

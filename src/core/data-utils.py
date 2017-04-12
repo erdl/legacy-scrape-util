@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import src.core.fileutils as fileutils
 from collections import namedtuple
+import time
 import toml
 import os.path as path
 import os
 import sys
+import csv
 
 # Default data type to be returned by all data-acquisition
 # scripts.  Key requirement for interoperability between
@@ -64,3 +66,20 @@ def generate_config(projdir):
     projects = [p for p in projects if path.isdir(projdir + p)]
     config = {p: {'is-active': True} for p in projects}
     return config
+
+def save_archive(project,tag,rows):
+    directory = 'tmp/archive/{}/'.format(project)
+    timeindex = str(int(time.time()))
+    filename = tag + '-' + timeindex + '.csv'
+    if not path.isdir(directory):
+        os.makedirs(directory)
+    save_csv(directory,filename,rows)
+
+
+def save_csv(directory,filename,rows):
+    header = list(rows[0]._fields)
+    with open(directory + filename, 'w') as fp:
+        writer = csv.writer(fp)
+        writer.writerow(header)
+        for row in rows:
+            writer.writerow(row)

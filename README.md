@@ -1,5 +1,13 @@
 # scrape-util
 
+**Warning:** This project is currently being modified to allow
+for more consistent config file layouts across project types,
+as well as to allow for multiple separate modes of data-acquisition
+within a single project.  As such, a number of breaking changes are
+occurring.  New documentation will be up soon explaining the new
+configuration format(s), and this page will announce when the
+internals have stabilized again.
+
 ## About
 
 This application aims to provide a unified and simple method of
