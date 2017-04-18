@@ -4,6 +4,18 @@ import csv
 import os
 import os.path as path
 
+# exception raising shortcut, because of all the damn exceptions!
+def error_template(sec):
+    error_message = lambda sec,ctx,prob: '''\n
+    An Error Has Occurred:\n
+    Section -- {}\n
+    Context -- {}\n
+    Problem -- {}\n
+    '''.format(sec,ctx,prob)
+    template = lambda ctx: lambda prob: error_message(sec,ctx,prob)
+    return template
+
+
 # Generate and update a simple and readable log file.
 def mklog(project,text):
     # surround error text in time & project specifiers.

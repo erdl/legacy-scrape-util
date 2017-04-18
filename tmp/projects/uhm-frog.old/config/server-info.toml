@@ -1,0 +1,6 @@
+[login]
+name = "apitest"
+pass = "apipass"
+
+[query]
+uri = "http://www.soest.hawaii.edu/hneienergy/bulktrendserver/read"

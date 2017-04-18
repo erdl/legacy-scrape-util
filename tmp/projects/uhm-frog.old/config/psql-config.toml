@@ -1,0 +1,9 @@
+[general]
+is-active = false
+database = "frog_uhm"
+table = "reading"
+save-duplicates = true
+
+[conversions]
+datetime = "to-timestamp"
+upload_timestamp = "to-timestamp"

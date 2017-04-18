@@ -8,36 +8,31 @@
 # `sensor=oranges`, and `unit=carrots` can be
 # acted upon as a singular group.
 
-
 [settings]
 is-active = false
-map-target = "some-field"
-on-mapping = "discard" # defaults to "discard"
+uid-key = ["node","name","unit"] # defaults to ["node","name","unit"]
+on-replace = "discard" # defaults to "discard"
 on-filter = "discard" # possibilities: discard, archive
-in-order = ["filters","mappings","generators"]
+in-order = ["filter","replace","generate"]
 
+[replace]
+node1-sensor1-someunit = { name = 0 }
 
-[mappings]
-node1-sensor1-someunit = { sensor = 0 }
-
-
-
-[filters]
-some-data-to-constrain = { min = 0, max = 100000 }
+[filter]
+some-data-to-constrain = { min = 0, max = 100000, dec = 2 }
 some-data-to-remove = true
-some-data-to-keep = false # optional
+some-data-to-keep = false
 
-
-[[generators]]
+[[generate]]
 node = "some-node"
 name = "some-name"
 unit = "some-unit"
 add = ["some-data-point-1","some-data-point-2"]
 sub = ["some-data-point-3"]
 
-[[generators]]
+[[generate]]
 node = "some-other-node"
 name = "some-other-name"
 unit = "some-other-unit"
-add = { node = "some-node",unit = "some-unit" }
+add = { node = "some-node",unit = "some-unit" } # not yet implemented
 sub = ["some-specific-data-point"]

@@ -1,0 +1,9 @@
+[acquire]
+webctrl-file = "webctrl-config"
+
+[reshape]
+field-file = "field-map"
+value-file = "value-map"
+
+[export]
+csv = true

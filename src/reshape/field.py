@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
+from src.core.error_utils import error_template
 from collections import namedtuple
 
 # Defines order of
 # execution in reshape runtime.
 ORD = 2
 
-# reshape : proj -> conf -> data -> data
-def reshape(project,config,data):
+field_error = error_template('`field` based data-reshaping step')
+
+def reshape(project,config,state,data):
     data = map_fields(data,config)
-    return data
+    return state,data
 
 # Map one or more fields to some other set of fields.
 def map_fields(data,fieldmap):
+    mkerr = field_error('field name & order reassignment')
     if not data: return []
     fieldmap = { k.lower() : fieldmap[k] for k in fieldmap }
     dfields  = data[0]._fields
+    for field in fieldmap:
+        if field not in dfields:
+            error = mkerr('unrecognized field: ' + field)
+            raise Exception(error)
     indexmap = []
     namemap  = []
     for di,df in enumerate(dfields):

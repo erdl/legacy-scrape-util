@@ -1,0 +1,20 @@
+# DEV: modify current `field` behavior to be a sub-option of
+# the field reshaping feature.  Integrate the ability to add
+# custom fields, such as upload time, as another feature of
+# the `field` implementation.
+
+[timestamp]
+name = "datetime"
+slot = 0
+
+[name]
+name = "purpose_id"
+slot = 1
+
+[unit]
+name = "units"
+slot = 2
+
+[value]
+name = "reading"
+slot = 3

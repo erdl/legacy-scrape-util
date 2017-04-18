@@ -1,0 +1,26 @@
+[acquire]
+type = "webctrl"
+sensor-file = "sensor-map"
+server-file = "server-info"
+
+[[acquire.extra]]
+type = "calculated-row"
+config-file = "calc-map-1"
+
+[[acquire.extra]]
+type = "calculated-row"
+config-file = "calc-map-2"
+
+
+[reshape]
+value-file = "value-map"
+field-file = "field-map"
+
+[[reshape.extra]]
+type = "current-time"
+name = "upload_timestamp"
+
+
+[export]
+csv = true
+psql-file = "psql-config"

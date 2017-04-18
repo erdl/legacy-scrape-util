@@ -1,0 +1,160 @@
+[settings]
+is-active = true
+uid-key = ["node","name","unit"]
+to-replace = "name"
+in-order = ["generate","filter","replace"]
+
+
+[filter]
+frog-1-whole-building-avg-kw = { dec = 2 }
+frog-2-whole-building-avg-kw = { dec = 2 }
+
+
+[[generate]]
+node = "frog-1"
+name = "other-avg"
+unit = "kW"
+add = ["frog-1-whole-building-avg-kw"]
+sub = [
+  "frog-1-air-handler-avg-kw",
+  "frog-1-building-services-avg-kw",
+  "frog-1-ceiling-fans-avg-kw",
+  "frog-1-chiller-avg-kw",
+  "frog-1-exterior-lights-avg-kw",
+  "frog-1-fire-alarm-avg-kw",
+  "frog-1-lutron-lights-avg-kw",
+  "frog-1-service-lights-avg-kw",
+  "frog-1-window-actuators-avg-kw"
+]
+
+
+[[generate]]
+node = "frog-2"
+name = "other-avg"
+unit = "kW"
+add = ["frog-2-whole-building-avg-kw"]
+sub = [
+  "frog-2-air-handler-avg-kw",
+  "frog-2-building-services-it-avg-kw",
+  "frog-2-ceiling-fans-avg-kw",
+  "frog-2-chiller-avg-kw",
+  "frog-2-exterior-lights-avg-kw",
+  "frog-2-fire-alarm-avg-kw",
+  "frog-2-lutron-lights-avg-kw",
+  "frog-2-service-lights-avg-kw",
+  "frog-2-window-actuators-avg-kw"
+]
+
+
+[replace]
+frog-2-service-lights-kw = 43
+frog-1-window-actuators-kw = 41
+frog-1-zone-temp-2-f = 20
+frog-2-wall-temp-1-f = 25
+frog-1-lutron-lights-kwh = 61
+"frog-1-zone-humidity-1-%" = 3
+"frog-2-duct-return-humidity-%" = 5
+frog-1-ceiling-fans-kw = 33
+frog-2-light-lux = 79
+frog-1-window-actuators-kwh = 65
+frog-2-fire-alarm-kwh = 72
+frog-1-chiller-avg-kw = 89
+frog-1-duct-return-temp-f = 13
+frog-2-window-actuators-avg-kw = 110
+frog-2-ceiling-fans-kwh = 69
+"frog-2-zone-humidity-2-%" = 8
+frog-2-whole-building-kwh = 76
+"frog-2-duct-supply-humidity-%" = 6
+frog-1-air-handler-kw = 30
+frog-2-ceiling-fans-kw = 45
+frog-1-building-services-it-kw = 32
+frog-1-co2-ppm = 81
+frog-1-whole-building-kw = 40
+frog-1-zone-temp-1-f = 19
+frog-2-wall-temp-3-f = 27
+frog-1-service-lights-kw = 31
+frog-2-exterior-lights-kwh = 71
+frog-2-building-services-it-kwh = 68
+"frog-1-duct-supply-humidity-%" = 2
+"frog-2-zone-humidity-1-%" = 7
+frog-2-duct-return-temp-f = 21
+frog-1-exterior-lights-kw = 35
+frog-2-zone-temp-1-f = 24
+frog-2-other-avg-kw = 111
+frog-2-air-handler-kwh = 66
+frog-2-fire-alarm-avg-kw = 104
+frog-2-building-services-it-avg-kw = 100
+weather-station-barometric-pressure-hpa = 29
+frog-2-fire-alarm-kw = 48
+frog-2-service-lights-kwh = 67
+frog-2-solar-2-kw = 51
+frog-2-exterior-lights-kw = 47
+frog-2-chiller-kwh = 70
+frog-2-whole-building-kw = 52
+frog-2-solar-1-kwh = 74
+frog-2-solar-1-kw = 50
+frog-1-solar-2-kw = 39
+frog-1-fire-alarm-kwh = 60
+frog-1-air-handler-kwh = 54
+weather-station-solar-radiation-wm-2 = 83
+frog-1-building-services-it-kwh = 56
+frog-1-service-lights-avg-kw = 93
+frog-1-solar-1-avg-kw = 94
+frog-2-solar-1-avg-kw = 107
+frog-1-wall-temp-3-f = 18
+frog-1-solar-2-avg-kw = 95
+frog-2-chiller-kw = 46
+"weather-station-wind-speed-m/s" = 80
+frog-1-solar-1-kwh = 62
+frog-2-exterior-lights-avg-kw = 103
+frog-1-whole-building-avg-kw = 96
+"weather-station-humidity-%" = 9
+frog-2-duct-supply-temp-f = 22
+frog-2-chiller-avg-kw = 102
+frog-1-ceiling-fans-avg-kw = 88
+frog-1-light-lux = 78
+frog-1-lutron-lights-kw = 37
+frog-1-wall-temp-1-f = 16
+weather-station-dewpoint-c = 11
+frog-1-air-handler-avg-kw = 86
+frog-2-solar-2-kwh = 75
+frog-2-lutron-lights-kw = 49
+frog-2-air-handler-kw = 42
+frog-2-lutron-lights-avg-kw = 105
+frog-2-egauge-power-kw = 85
+frog-2-service-lights-avg-kw = 106
+frog-1-ceiling-fans-kwh = 57
+"frog-1-duct-return-humidity-%" = 1
+frog-2-globe-temp-f = 23
+frog-1-solar-2-kwh = 63
+frog-2-lutron-lights-kwh = 73
+frog-2-zone-temp-2-f = 28
+"frog-1-zone-humidity-2-%" = 4
+frog-1-whole-building-kwh = 64
+frog-2-co2-ppm = 82
+frog-1-solar-1-kw = 38
+frog-1-globe-temp-f = 15
+frog-1-fire-alarm-avg-kw = 91
+frog-2-air-handler-avg-kw = 99
+frog-1-other-avg-kw = 98
+frog-1-fire-alarm-kw = 36
+frog-1-egauge-power-kw = 84
+frog-1-lutron-lights-avg-kw = 92
+weather-station-dry-bulb-temp-c = 10
+frog-1-exterior-lights-kwh = 59
+frog-2-solar-2-avg-kw = 108
+frog-2-wall-temp-2-f = 26
+frog-1-exterior-lights-avg-kw = 90
+frog-2-window-actuators-kwh = 77
+frog-2-whole-building-avg-kw = 109
+frog-1-window-actuators-avg-kw = 97
+frog-2-window-actuators-kw = 53
+frog-2-building-services-kw = 44
+frog-1-duct-supply-temp-f = 14
+frog-2-ceiling-fans-avg-kw = 101
+frog-1-building-services-avg-kw = 87
+frog-1-service-lights-kwh = 55
+frog-1-wall-temp-2-f = 17
+weather-station-wind-direction-deg = 12
+frog-1-chiller-kw = 34
+frog-1-chiller-kwh = 58

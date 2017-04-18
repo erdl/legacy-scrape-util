@@ -5,7 +5,7 @@ import time
 
 # primary entry point for scrape of egauges.
 # Returns any acquired data & updated nonce.
-def scrape(project,config,state):
+def acquire(project,config,state):
     gauges = config["gauges"]
     state = check_state(gauges,state)
     nonce = state['nonce']
@@ -22,7 +22,7 @@ def scrape(project,config,state):
         data += rows
     print('gauge queries complete...')
     state['nonce'] = nonce
-    return data,state
+    return state,data
 
 
 # check on state, generating any missing values.
@@ -35,7 +35,6 @@ def check_state(gauges,state):
     else: delta = None
     if not 'nonce' in state: state['nonce'] = {}
     state['nonce'] = check_nonce(gauges,state['nonce'],delta)
-    if not 'nonce-file' in state: state['nonce-file'] = 'nonce'
     return state
 
 

@@ -8,10 +8,9 @@ GENERATORS = {
     'current-time' : lambda c,d: current_time(c,d)
 }
 
-# reshape : proj -> conf -> data -> data
-def reshape(project,config,data):
+def reshape(project,config,state,data):
     data = add_fields(config,data)
-    return data
+    return state,data
 
 # Iterate over the configuration list,
 # adding a new field for each configuration.

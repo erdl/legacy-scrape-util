@@ -5,7 +5,7 @@ import os.path as path
 import os
 
 # primary entry point.
-def scrape(project,config,state):
+def acquire(project,config,state):
     source = dircheck(project,config)
     parser = get_parser(config['parser'])
     ext = '.{}'.format(config['settings']['suffix'])

@@ -5,7 +5,7 @@ import time
 
 
 # Main push-to-psql entry point
-def export(data,project,config):
+def export(project,config,state,data):
     db  = config['general']['database']
     tbl = config['general']['table']
     fields = data[0]._fields
@@ -30,6 +30,7 @@ def export(data,project,config):
     # append any unexpected errors to
     # the project's main error log.
     for err in errtxt: mklog(project,err)
+    return state
 
 # Controller for the actual push attempt.
 # Forces all rows to be attempted at least once.

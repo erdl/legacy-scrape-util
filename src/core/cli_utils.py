@@ -1,42 +1,29 @@
 #!/usr/bin/env python3
-from src.core.data_utils import get_master_config
+import src.core.file_utils as file_utils
 import argparse as ap
 import shutil
 import sys
 import os
 
-
+# main entry point for the command line interface.
+# currently, the cli allows for the generation of new
+# project templates, as well as the selective running of
+# all, or some subset, of active projects.
 def run_cli():
-    args = vars(get_args())
+    args = get_args()
     if not args['action']:
         print('no action specified... run with `-h` for more info.')
-        sys.exit(0)
+        return []
     elif args['action'] == 'new':
         new_project(args)
-        print('program closing...')
-        sys.exit(0)
+        return []
     elif args['action'] == 'run':
-        return get_projects(args)
+        return assemble_projects(args['projects'])
     else:
         print('unrecognized action: ',args['action'])
+        return []
 
-
-def get_projects(args):
-    projects = args['projects']
-    if 'all' in projects:
-        config = get_master_config()
-    else: config = get_master_config(expect=projects)
-    return config
-
-
-def new_project(args):
-    projname = args['project_name']
-    acquire = args['acquire_step']
-    projdir = mktemplate(projname)
-    if acquire: mkacquire(projdir,acquire)
-    print('new project generated at: ',projdir)
-
-
+# parses user aguments,
 def get_args():
     # initialize the parser object.
     parser = ap.ArgumentParser()
@@ -53,11 +40,30 @@ def get_args():
         help='name of the new project')
     newproj.add_argument('-a','--acquire_step',default=None,
         help='acquire step to use',type=str)
-    return parser.parse_args()
+    return vars(parser.parse_args())
 
+# assemble the list of projects to be run.
+def assemble_projects(projects):
+    directory = 'tmp/projects/'
+    allproj = file_utils.get_projects()
+    if 'all' in projects:
+        return allproj
+    for proj in projects:
+        if not proj in allproj:
+            raise Exception('no project folder found matching: ' + proj)
+    return projects
 
+# generate a new project template.
+def new_project(args):
+    projname = args['project_name']
+    acquire = args['acquire_step']
+    projdir = mktemplate(projname)
+    if acquire: mkacquire(projdir,acquire)
+    print('new project generated at: ',projdir)
+
+# generate an `acquire` step template to a project.
 def mkacquire(projdir,steptype):
-    src = 'src/cli/templates/acquire/'
+    src = 'src/core/templates/acquire/'
     dst = projdir if projdir.endswith('/') else projdir + '/'
     templates = [f for f in os.listdir(src) if f.endswith('-config.toml')]
     targets = [f for f in templates if f.startswith(steptype)]
@@ -77,9 +83,10 @@ def mkacquire(projdir,steptype):
         for line in clines:
             print(line,file=fp)
 
-
+# copy the core project template to the
+# appropriate directory.
 def mktemplate(projname):
-    src = 'src/cli/templates/project'
+    src = 'src/core/templates/project'
     dst = 'tmp/projects/{}/'.format(projname)
     shutil.copytree(src,dst)
     return dst

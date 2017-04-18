@@ -6,13 +6,14 @@ import csv
 import os
 
 # Main save-to-csv entry point.
-def export(data,project,config):
+def export(project,config,state,data):
     # TODO: use csv config values for something...
     # probably for choosing file txt, etc...
     try: save_csv(project,data)
     except Exception as err:
         mklog(project,err)
         errdata(project,data,txt='csverr')
+    return state
 
 # Save it to a thing!
 def save_csv(project,data,txt='raw'):

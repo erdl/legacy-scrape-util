@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-from src.core.data_utils import Row, mkuid
+from src.core.data_utils import Row, get_uid_generator, check_config
+from src.core.error_utils import error_template
 import requests
 import time
 
+# an experimental shortcut to nicer errors :)
+webctrl_error = error_template('`webctrl` data-acquisition step')
+
 # Primary entry point for webctrl scrape.
 # Returns data & updated state.
-def scrape(project,config,state):
-    state = check_state(project,config,state)
+def acquire(project,config,state):
+    state = setup(project,config,state)
     nonce = state['nonce']
-    sensors = config['sensors']
+    sensors = config['sensor']
     data = []
     query = new_query(config['settings'])
+    mkuid = get_uid_generator()
     # cycle through all nodes, querying
     # all sensors associated with each node.
     for sensor in sensors:
@@ -19,7 +24,7 @@ def scrape(project,config,state):
         name,path = sensor['name'], sensor['path']
         node = sensor['node'] if 'node' in sensor else project
         unit = sensor['unit'] if 'unit' in sensor else 'undefined'
-        code = mkuid(node,name,unit)
+        code = mkuid((node,name,unit))
         after = nonce[code]
         result = query(path,after)
         lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
@@ -29,10 +34,21 @@ def scrape(project,config,state):
         nonce[code] = max(rows,key=fltr).timestamp
         data += rows
     state['nonce'] = nonce
-    if not 'nonce-file' in state:
-        state['nonce-file'] = 'nonce'
-    return data,state
+    return state,data
 
+# do general housekeeping before data-acquisition
+# begins.  Specifically, ensure that `config` is valid,
+# and that we have all necessary data in `state`.
+def setup(project,config,state):
+    proto_config = {'sensor':list ,'settings': {
+        'server':str,'login':{'name':str,'pass':str} } }
+    msg = 'checking configuration values for project: ' + project
+    mkerr = webctrl_error(msg)
+    check_config('webctrl',proto_config,config,mkerr=mkerr)
+    # if `config` checks out, we can assess `state`
+    # and add/update any missing missing values.
+    state = check_state(project,config,state)
+    return state
 
 # check on state, generating any missing values.
 def check_state(project,config,state):
@@ -42,20 +58,21 @@ def check_state(project,config,state):
         del state['init']
     else: delta = None
     nonce = state['nonce'] if 'nonce' in state else {}
-    state['nonce'] = check_nonce(project,config['sensors'],nonce,delta)
+    state['nonce'] = check_nonce(project,config['sensor'],nonce,delta)
     return state
 
 
 # Add a new nonce field for any sensors
 # not found in the nonce.
 def check_nonce(project,sensors,nonce,delta=None):
+    mkuid = get_uid_generator()
     if not delta:
         delta = time.time() - 86400
     for sensor in sensors:
         node = sensor['node'] if 'node' in sensor else project
         unit = sensor['unit'] if 'unit' in sensor else 'undefined'
         name = sensor['name']
-        code = mkuid(node,name,unit)
+        code = mkuid((node,name,unit))
         if not code in nonce:
             nonce[code] = delta
     return nonce
