@@ -1,7 +1,7 @@
 # Project-Specific
-tmp/outputs/*
-tmp/errors/*
-state-files/*
+tmp/outputs/
+tmp/errors/
+state-files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
