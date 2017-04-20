@@ -25,7 +25,7 @@ def export(project,config,state,data):
     if errors: errdata(project,errors,txt='psqlerr')
     # if `save-duplicates` is flagged `true`, save
     # all duplicate rows to the errors directory.
-    if duplicates and 'save-duplicates' settings:
+    if duplicates and 'save-duplicates' in settings:
         if settings['save-duplicates']:
             errdata(project,duplicates,txt='psqldups')
     # append any unexpected errors to
