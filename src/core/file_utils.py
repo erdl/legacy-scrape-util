@@ -27,7 +27,7 @@ def get_config(project):
 
 # load existent state files if any.
 def get_state(project):
-    directory = 'tmp/projects/{}/state/'.format(project)
+    directory = 'tmp/projects/{}/state-files/'.format(project)
     if not path.isdir(directory):
         return {}
     files = list_files(directory)
@@ -43,7 +43,7 @@ def get_state(project):
 
 # save all elements of the current state object.
 def save_state(project,state):
-    directory = 'tmp/projects/{}/state/'.format(project)
+    directory = 'tmp/projects/{}/state-files/'.format(project)
     if not path.isdir(directory):
         os.makedirs(directory)
     for key in state:

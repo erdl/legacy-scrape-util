@@ -1,5 +1,5 @@
 [settings]
-is-active = true
+is-active = false
 database = "frog_uhm"
 table = "reading"
 save-duplicates = true
