@@ -1,8 +1,52 @@
-[sensor.set]
-concat-map = ["node","sensor","unit"]
-ignore = []
+[settings]
+is-active = true
+uid-key = ["node","name","unit"]
+to-replace = "name"
+in-order = ["generate","filter","replace"]
 
-[sensor.map]
+
+[filter]
+frog-1-whole-building-avg-kw = { dec = 2 }
+frog-2-whole-building-avg-kw = { dec = 2 }
+
+
+[[generate]]
+node = "frog-1"
+name = "other-avg"
+unit = "kW"
+add = ["frog-1-whole-building-avg-kw"]
+sub = [
+  "frog-1-air-handler-avg-kw",
+  "frog-1-building-services-avg-kw",
+  "frog-1-ceiling-fans-avg-kw",
+  "frog-1-chiller-avg-kw",
+  "frog-1-exterior-lights-avg-kw",
+  "frog-1-fire-alarm-avg-kw",
+  "frog-1-lutron-lights-avg-kw",
+  "frog-1-service-lights-avg-kw",
+  "frog-1-window-actuators-avg-kw"
+]
+
+
+[[generate]]
+node = "frog-2"
+name = "other-avg"
+unit = "kW"
+add = ["frog-2-whole-building-avg-kw"]
+sub = [
+  "frog-2-air-handler-avg-kw",
+  "frog-2-building-services-it-avg-kw",
+  "frog-2-ceiling-fans-avg-kw",
+  "frog-2-chiller-avg-kw",
+  "frog-2-exterior-lights-avg-kw",
+  "frog-2-fire-alarm-avg-kw",
+  "frog-2-lutron-lights-avg-kw",
+  "frog-2-service-lights-avg-kw",
+  "frog-2-window-actuators-avg-kw"
+]
+
+
+[replace]
 frog-2-service-lights-kw = 43
 frog-1-window-actuators-kw = 41
 frog-1-zone-temp-2-f = 20
@@ -77,7 +121,7 @@ frog-2-solar-2-kwh = 75
 frog-2-lutron-lights-kw = 49
 frog-2-air-handler-kw = 42
 frog-2-lutron-lights-avg-kw = 105
-frog-2-egauge-power-kw = 85
+frog-2-egauge-usage-kw = 85
 frog-2-service-lights-avg-kw = 106
 frog-1-ceiling-fans-kwh = 57
 "frog-1-duct-return-humidity-%" = 1
@@ -94,7 +138,7 @@ frog-1-fire-alarm-avg-kw = 91
 frog-2-air-handler-avg-kw = 99
 frog-1-other-avg-kw = 98
 frog-1-fire-alarm-kw = 36
-frog-1-egauge-power-kw = 84
+frog-1-egauge-usage-kw = 84
 frog-1-lutron-lights-avg-kw = 92
 weather-station-dry-bulb-temp-c = 10
 frog-1-exterior-lights-kwh = 59

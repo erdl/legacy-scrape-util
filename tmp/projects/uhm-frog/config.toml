@@ -1,9 +1,11 @@
 [acquire]
 webctrl-file = "webctrl-config"
+egauge-file = "egauge-config"
 
 [reshape]
-field-file = "field-map"
-value-file = "value-map"
+field-file = "field-remap"
+value-file = "value-remap"
 
 [export]
+psql-file = "psql-config"
 csv = true

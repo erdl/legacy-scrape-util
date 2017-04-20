@@ -30,6 +30,11 @@ def row_generator(node,name,unit):
     gen = lambda t,v: Row(node,name,unit,float(t),float(v))
     return gen
 
+def custom_row_generator(fields):
+    custom = namedtuple('row',fields)
+    generator = lambda vals: custom(*vals)
+    return generator
+
 
 # get a uid generator based on an ordered mapping of fields.
 def get_uid_generator(key=None):
@@ -123,7 +128,7 @@ def match_rows(spec,rows,rowtype=Row):
 # a filter that returns true for any row whose first
 # element ends with `foo`.
 def make_row_matcher(target,index):
-    match = matchstr.replace('*','')
+    match = target.replace('*','')
     sw = lambda s,m: s.lower().startswith(m.lower())
     ew = lambda s,m: s.lower().endswith(m.lower())
     if not '*' in target:

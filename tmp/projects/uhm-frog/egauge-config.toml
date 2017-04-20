@@ -1,0 +1,11 @@
+[settings]
+is-active = true
+
+[gauges]
+frog-1-egauge = 791
+frog-2-egauge = 793
+
+
+[[filter]]
+mode = "positive"
+name = "usage"

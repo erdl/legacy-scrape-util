@@ -6,8 +6,9 @@ import time
 
 # Main push-to-psql entry point
 def export(project,config,state,data):
-    db  = config['general']['database']
-    tbl = config['general']['table']
+    settings = config['settings']
+    db  = settings['database']
+    tbl = settings['table']
     fields = data[0]._fields
     # handle custom-inserion instance if needed.
     if 'conversions' in config:
@@ -24,8 +25,8 @@ def export(project,config,state,data):
     if errors: errdata(project,errors,txt='psqlerr')
     # if `save-duplicates` is flagged `true`, save
     # all duplicate rows to the errors directory.
-    if duplicates and 'save-duplicates' in config['general']:
-        if config['general']['save-duplicates']:
+    if duplicates and 'save-duplicates' settings:
+        if settings['save-duplicates']:
             errdata(project,duplicates,txt='psqldups')
     # append any unexpected errors to
     # the project's main error log.

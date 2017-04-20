@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-from src.core.data_utils import Row
+import src.core.data_utils as du
+import src.core.error_utils as eu
 import requests
 import time
+
+
+egauge_error = eu.error_template("`egauge` data-acquisition step")
 
 # primary entry point for scrape of egauges.
 # Returns any acquired data & updated nonce.
@@ -21,8 +25,29 @@ def acquire(project,config,state):
         nonce[gid] = max(rows,key=fltr).timestamp
         data += rows
     print('gauge queries complete...')
+    if 'filter' in config:
+        data = run_filters(config['filter'],data)
     state['nonce'] = nonce
     return state,data
+
+
+# a limited data filtering functionality, because method
+# acquired a bulk dump of egauge data, and it may be useful
+# to pre-imtively remove unwanted values.
+def run_filters(filters,data):
+    mkerr = egauge_error("filtering acquired data-points")
+    rows = [r for r in data]
+    for spec in filters:
+        mode = spec.pop("mode")
+        ismatch,nomatch = du.match_rows(spec,rows)
+        if mode == "positive":
+            rows = ismatch
+        elif mode == "negative":
+            rows = nomatch
+        else:
+            error = mkerr("unrecognized filter mode: " + str(mode))
+            raise Exception(error)
+    return rows
 
 
 # check on state, generating any missing values.
@@ -74,9 +99,9 @@ def fmt_query(gauge_id,data):
     # break out readings into form standard form:
     # ( node, sensor, unit, timestamp, value )
     for sn in values:
-        unit,snid = parse_sntxt(sn)
-        fmt = lambda t,v: Row(gauge_id,snid,unit,t,v)
-        formatted += [fmt(t,v) for t,v in zip(dtimes,values[sn])]
+        name,unit = parse_sntxt(sn)
+        mkrow = du.row_generator(gauge_id,name,unit)
+        formatted += [mkrow(t,v) for t,v in zip(dtimes,values[sn])]
     return formatted
 
 # Split the egauge supplied sensor/column name
@@ -86,12 +111,12 @@ def fmt_query(gauge_id,data):
 def parse_sntxt(sensor):
     try:
         unit = sensor.split('[').pop().replace(']','').replace(' ','')
-        snid = sensor.split(' [').pop(0).lower()
+        name = sensor.split(' [').pop(0).lower()
     except Exception as err:
         print('failed to parse: {}'.format(sensor))
         print('parse error: {}'.format(err))
         # if parse fails, lower case column name is used as
         # sensor id, and unit is listed as "undefined".
         unit = 'undefined'
-        snid = sensor.lower()
-    return unit,snid
+        name = sensor.lower()
+    return name,unit

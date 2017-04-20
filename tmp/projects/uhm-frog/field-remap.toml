@@ -1,0 +1,23 @@
+# DEV: modify current `field` behavior to be a sub-option of
+# the field reshaping feature.  Integrate the ability to add
+# custom fields, such as upload time, as another feature of
+# the `field` implementation.
+
+[settings]
+is-active = true
+on-modify = "discard" # "discard" || "archive"
+in-order = ["modify","generate"] # default: ["modify","generate"]
+
+
+[modify]
+name = { title = "purpose_id", index = 1 }
+unit = { title = "units", index = 2 }
+value = { title = "reading", index = 3 }
+timestamp = { title = "datetime", index = 0 }
+
+
+[[generate]]
+value = "current-time"
+title = "upload_timestamp"
+index = "append" # default: "append"
+round = 2 # default: 6
