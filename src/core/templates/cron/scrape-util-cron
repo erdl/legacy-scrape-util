@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+from importlib import import_module
+import os
+
+# set this variable to the absolute path
+# of the scrape-util directory.
+DIRECTORY = '.'
+
+# imports `src.core.runtime` and executes
+# the program in `cron` mode (project-level
+# errors are caught & logged, preventing one
+# project from brining down the rest).
+def run_cron():
+    os.chdir(DIRECTORY)
+    runtime = import_module('src.core.runtime')
+    runtime.run(mode='cron')
+
+if __name__ == '__main__':
+    run_cron()
