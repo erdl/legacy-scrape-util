@@ -10,14 +10,14 @@ egauge_error = eu.error_template("`egauge` data-acquisition step")
 # primary entry point for scrape of egauges.
 # Returns any acquired data & updated nonce.
 def acquire(project,config,state):
-    gauges = config["gauges"]
-    state = check_state(gauges,state)
-    nonce = state['nonce']
+    starts,stops = setup_times(project,config,state)
+    gauges = config['gauges']
+    nonce = {k:v for k,v in starts.items()}
     data = []
     fltr = lambda r : r.timestamp
     for gid in gauges:
         print('querying gauge: {}...'.format(gid))
-        raw = query(gauges[gid],nonce[gid])
+        raw = query(gauges[gid],starts[gid],stops[gid])
         if not raw: continue
         rows = fmt_query(gid,raw)
         if not rows: continue
@@ -49,36 +49,27 @@ def run_filters(filters,data):
             raise Exception(error)
     return rows
 
-
-# check on state, generating any missing values.
-def check_state(gauges,state):
-    # read & remove init section if found.
-    if 'init' in state:
-        init = state['init']
-        del state['init']
-        delta = init['start-from'] if 'start-from' in init else None
-    else: delta = None
-    if not 'nonce' in state: state['nonce'] = {}
-    state['nonce'] = check_nonce(gauges,state['nonce'],delta)
-    return state
-
-
-# Add a new nonce field for any gauge
-# not found in the nonce.
-def check_nonce(gauges,nonce,delta=None):
-    if not delta:
-        delta = time.time() - 86400
+# initialzie start and stop times for all gauges.
+def setup_times(project,config,state):
+    settings = config.get('settings',{})
+    nonce = state.get('nonce',{})
+    gauges = config['gauges']
+    now = time.time()
+    init = settings.get('init-time',now-86400)
+    step = settings.get('step-time',31536000)
+    mkstop = lambda s: min((s+step,now))
+    start,stop = {},{}
     for gid in gauges:
-        if not gid in nonce:
-            nonce[gid] = delta
-    return nonce
+        start[gid] = nonce.get(gid,init)
+        stop[gid] = mkstop(start[gid])
+    return start,stop
 
 
 # Query a specified egauge.
 # Returns a dictionary of all columns w/ headers as keys.
-def query(gauge,after):
+def query(gauge,start,stop):
     uri = 'http://egauge{}.egaug.es/cgi-bin/egauge-show?c&C&m'
-    params = { 'w' : int(after) }
+    params = {'t': int(start), 'f': int(stop)}
     r = requests.get(uri.format(gauge),params=params)
     # break up the recieved csv into two-dimensional list structure.
     rows = [[y for y in x.split(',')] for x in r.text.splitlines()]

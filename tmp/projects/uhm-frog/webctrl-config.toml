@@ -1,6 +1,8 @@
 
 [settings]
-is-active = true
+init-time = 1483228800
+step-time = 1209600
+is-active = false
 login = { name = "apitest", pass = "apipass" }
 server = "http://www.soest.hawaii.edu/hneienergy/bulktrendserver/read"
 
