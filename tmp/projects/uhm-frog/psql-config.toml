@@ -2,7 +2,9 @@
 is-active = false
 database = "frog_uhm"
 table = "reading"
+primary-key = ["datetime","purpose_id"]
 save-duplicates = true
+
 
 [conversions]
 datetime = "to-timestamp"

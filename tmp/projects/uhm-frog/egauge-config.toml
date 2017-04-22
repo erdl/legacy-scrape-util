@@ -1,7 +1,7 @@
 [settings]
 init-time = 1483228800
 step-time = 1209600
-is-active = true
+is-active = false
 
 [gauges]
 frog-1-egauge = 791

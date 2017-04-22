@@ -10,6 +10,11 @@ def export(project,config,state,data):
     db  = settings['database']
     tbl = settings['table']
     fields = data[0]._fields
+    duplicates = []
+    primarykey = settings.get('primary-key',None)
+    if primarykey:
+        data,dups = enforce_key(data,key)
+        duplicates += dups
     # handle custom-inserion instance if needed.
     if 'conversions' in config:
         ins = custom_insertion(fields,config['conversions'])
@@ -17,7 +22,8 @@ def export(project,config,state,data):
     else: ins = ','.join(['%s'] * len(fields))
     cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)
     print('pushing {} rows to psql...'.format(len(data)))
-    errors,errtxt,duplicates = handle_push(data,cmd,db)
+    errors,errtxt,dups = handle_push(data,cmd,db)
+    duplicates += dups
     if duplicates:
         print('duplicate rows ignored: ',len(duplicates))
     # save any rows which raised unexpexted errors
@@ -98,3 +104,22 @@ def custom_insertion(fields,insmap):
             ins.append(inserts[insmap[f]])
         else: ins.append(inserts['default'])
     return ','.join(ins)
+
+
+# enforce a primary key.
+def enforce_key(data,key):
+    fields = list(data[0]._fields)
+    indexes = []
+    for field in key:
+        if not field in fields:
+            raise Exception('unknown primary key field: ' + field)
+        indexes.append(fields.index(field))
+    mkkey = lambda row: str(tuple((row[i] for i in indexes)))
+    seen,unique,dups = {},[],[]
+    for row in data:
+        pk = mkkey(row)
+        if not pk in seen:
+            unique.append(row)
+            seen[pk] = 1
+        else: dups.append(row)
+    return unique,dups
