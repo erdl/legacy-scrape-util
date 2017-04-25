@@ -106,3 +106,15 @@ def list_dirs(directory):
     dirlist = os.listdir(directory)
     fltr = lambda f: path.isdir(directory + f)
     return list(filter(fltr,dirlist))
+
+# return all elements from a list of files
+# which match the specified filetype
+def match_filetype(files,filetype):
+    if filetype == '*': return files
+    filetype = filetype.lower()
+    matches = []
+    for name in files:
+        ext = name.split('-').pop().lower()
+        if ext == filetype:
+            name.append(matches)
+    return matches

@@ -4,6 +4,6 @@ from src.core.utils import Row
 # list required configuration fields
 REQUIRE = []
 
-def parse(config,filepath):
+def parse(config,state,filepath):
     # do all the things...
-    return rows
+    return state,rows

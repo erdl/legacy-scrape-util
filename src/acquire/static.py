@@ -1,88 +1,95 @@
 #!/usr/bin/env python3
 from importlib import import_module
 from src.core.data_utils import Row
+from src.core.error_utils import error_template,mklog
+import src.core.file_utils as ft
 import os.path as path
 import os
 
-# primary entry point.
+static_error = error_template('`static` data-acquisition step')
+
+# primary entrr point: project -> config -> state -> (state,data)
 def acquire(project,config,state):
-    source = dircheck(project,config)
-    parser = get_parser(config['parser'])
-    ext = '.{}'.format(config['settings']['suffix'])
-    files = [ f for f in os.listdir(source) if f.endswith(ext) ]
-    if not files:
-        print('no files found at: {}'.format(source))
-        return [],{}
-    rows,fmts,errs = [],[],[]
-    parse = lambda f: parser.parse(project,config['parser'],state,source+f)
-    for f in files:
-        try:
-            state,r = parse(f)
-            rows += r
-            fmts += f
-        except Exception as err:
-            mklog(project,err)
-            errs += f
-    move_originals(project,config,source,fmts,errs)
-    return state,rows
+    print('runnint `static` data-acquisition method...\n')
+    # get contents of the `settings` field; defaults to empty dict.
+    settings = config.get('settings',{})
+    # get the list of parser specifications.
+    parsers = config['parser']
+    # generate the default directory to move successfully parsed files to.
+    fmt_default = settings.get('on-fmt','tmp/archive/{}/static/'.format(project))
+    # generate the default directory to move unsuccessfully parsed files to.
+    err_default = settings.get('on-err','tmp/errors/{}/static/'.format(project))
+    # generate the default directory to find files to parse.
+    src_default = settings.get('source','tmp/inputs/{}/'.format(project))
+    data = [] # collector for successufully generated rows.
+    # iteratively run all parsers.
+    for spec in parsers:
+        name = spec['parser'] # name of perser to use.
+        print('running static file parser: {}\n'.format(name))
+        parser = get_parser(name) # load specified parser.
+        on_fmt = spec.get('on-fmt',fmt_default) # fmt dest or default.
+        on_err = spec.get('on-err',err_default) # err dest or default.
+        source = spec.get('source',src_default) # file src or default.
+        suffix = spec.get('suffix','*') # file suffix of targets.
+        files = load_files(source,suffix) # files to parse.
+        # iteratively parse all files, moving them to
+        # `on_fmt` if no errors occur, and `on_err` if
+        # an exception is raised by `parser`.
+        for fname in files:
+            try:
+                print('attempting to parse file: {}'.format(fname))
+                substate = state.pop(name,{})
+                substate,rows = parser.parse(spec,substate,fname)
+                for r in rows: assert isinstance(r,Row)
+                data += rows
+                if substate: state[name] = substate
+                move_file(source,on_fmt,fname)
+                print('{} rows acquired during parsing...\n'.format(len(rows)))
+            except Exception as err:
+                print('error while parsing {}: '.format(fname) + err)
+                print('moving target file to: {}\n'.format(on_err))
+                mklog(err)
+                move_file(source,on_err,fname)
+    return state,data
+
+# move a file at src/name to dest/name.  If
+# strict is false, dest will be created if
+# it does not exist.
+def move_file(src,dest,name,strict=False):
+    mkerr = static_error('attempting to move file: ' + name)
+    src = src if src.endswith('/') else src + '/'
+    dest = dest if dest.endswith('/') else dest + '/'
+    if not path.isdir(src):
+        error = mkerr('source directory does not exist: ' + src)
+        raise Exception(error)
+    if not path.isdir(dest):
+        if strict:
+            error = mkerr('destination directory does not exist: ' + dest)
+            raise Exception(error)
+        else: os.makedirs(dest)
+    frompath = src + name
+    intopath = dest + name
+    os.rename(frompath,intopath)
 
 
-# check that the input directory exists.
-def dircheck(project,config):
-    default = 'tmp/inputs/{}/'.format(project)
-    if 'source' in config['settings']:
-        source = config['settings']['source']
-    else:
-        print('assuming default directory as source...')
-        source = default
+# attempts to load a list of files based on
+# a given parser specification.
+def load_files(source,suffix):
+    mkerr = static_error('loading files for parsing...')
     if not path.isdir(source):
-        if source == default:
-            msg = 'missing default directory: {}'.format(source)
-        else: msg = 'directory does not exist: {}'.format(source)
-        raise Exception(msg)
-    return source
-
+        error = mkerr('source directory does not exist: ' + source)
+        raise Exception(error)
+    files = fu.list_files(source)
+    matches = fu.match_filetype(files,suffix)
+    return matches
 
 # attempts to load the specified parser.
-def get_parser(config):
-    if not 'type' in config:
-        raise Exception('no parser type defined.')
-    pname = config['type']
-    modname = 'src.acquire.parsers.{}'.format(pname).lower()
-    try: mod = import_module(modname)
-    except: raise Exception('no parser named: {}'.format(pname))
+def get_parser(parser):
+    mkerr = static_error('loading static file parser: ' + parser)
+    modname = 'src.acquire.parsers.{}'.format(parser).lower()
+    try:
+        mod = import_module(modname)
+    except:
+        error = mkerr('failed to load parser module: ' + parser)
+        raise Exception(error)
     return mod
-
-# handles relocation of files after parser is run.
-def move_originals(project,config,source,fmts,errs):
-    if 'move-to' in config: moveto = config['move-to']
-    else: moveto = {}
-    if 'fmt' not in moveto: moveto['fmt'] = 'default'
-    if 'err' not in moveto: moveto['err'] = 'default'
-    reloc = lambda m,f,k : relocate(project,source,m,f,k)
-    if fmts: reloc(moveto['fmt'],fmts,'archive')
-    if errs: reloc(moveto['err'],errs,'errors')
-
-# performs a specified batch relocation.
-# supports three key-word actions:
-# `default`, `delete`, and `rename`.
-def relocate(project,source,moveto,files,kind):
-    if moveto == 'default':
-        moveto = 'tmp/{}/{}/static/'.format(kind,project)
-    elif moveto == 'delete':
-        for f in files: os.remove(source+f)
-        return
-    elif moveto == 'rename':
-        files = [ f + '.' + kind for f in files ]
-        moveto = source
-    dirset(moveto)
-    print('moving {} files to {}...'.format(len(files),moveto))
-    for f in files:
-        frompath = source + f
-        intopath = moveto + f
-        os.rename(frompath,intopath)
-
-# ensure that a directory exists.
-def dirset(directory):
-    if not path.isdir(directory):
-        os.makedirs(directory)

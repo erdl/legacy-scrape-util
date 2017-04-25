@@ -11,16 +11,22 @@
 # to `true`, or deleted.
 [settings]
 is-active = false
-on-fmt = "default" # defaults to tmp/archive/projname/static/
-on-err = "default" # defaults to tmp/errors/projname/static/
+suffix = "file-extension"
+source = "path/to/files" # optional
 
 # The pareser section must minimally declare the type of
 # parser to be used, Ex; `type = "csv"`.  Any arguments that
 # the specific perser implementation requires also go here,
 # or in a sub-section.  Ex: `[parser.example]`.
-[[parser]]
-suffix = "file-extension" # defaults to `*`
-source = "path/to/files" # defaults to `tmp/inputs/projname/`
-parser = "some-parser"
-
+[parser]
+type = "some-parser"
 # ...
+
+# The `move-to` section is entirely optional.
+# This section defines where to move the original
+# files based upon wether parsing was successful,
+# or encountered some kind of error.  These fields
+# may be set to keywords `default` or `delete` as well.
+[move-to]
+on-fmt = "default" # default: `tmp/archive/projectname/static/`
+on-err = "default" # default: `tmp/errors/projectname/static/`

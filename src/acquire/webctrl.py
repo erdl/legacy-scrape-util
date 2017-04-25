@@ -27,14 +27,30 @@ def acquire(project,config,state):
         code = mkuid((node,name,unit))
         start,stop = starts[code],stops[code]
         result = query(path,start,stop)
-        lrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
-        rows = [lrow(r['t'],r['a']) for r in result if not '?' in r.values()]
+        mkrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
+        rows = parse_rows(mkrow,result)
         if not rows: continue
         fltr = lambda r: r.timestamp
         nonce[code] = max(rows,key=fltr).timestamp
         data += rows
     state['nonce'] = nonce
     return state,data
+
+# parse rows from raw webctrl data, removing erroneous data
+# and duplicates (the webctrl bulk-trend server periodically
+# returns duplicate values for a given timestamp...).
+def parse_rows(mkrow,data):
+    raw_rows = [mkrow(r['t'],r['a']) for r in data if not '?' in r.values()]
+    rows,times,dups = [],[],[]
+    for row in raw_rows:
+        t = row.timestamp
+        if not t in times:
+            times.append(t)
+            rows.append(row)
+        else: dups.append(row)
+    # TODO: optionally save duplicates to a special archive.
+    return rows
+
 
 # do general housekeeping before data-acquisition
 # begins.  Specifically, ensure that `config` is valid,
