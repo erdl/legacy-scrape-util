@@ -7,35 +7,40 @@ import os
 
 # Main save-to-csv entry point.
 def export(project,config,state,data):
-    # TODO: use csv config values for something...
-    # probably for choosing file txt, etc...
-    try: save_csv(project,data)
-    except Exception as err:
-        mklog(project,err)
-        errdata(project,data,txt='csverr')
+    if not data: return
+    # if `settings` exists, get it.
+    settings = config.get('settings',{})
+    # generate filepath & initialize destination
+    # directory if it does not yet exist.
+    filepath = setup(project,settings)
+    # save all data to the target file.
+    save_csv(filepath,data)
     return state
 
-# Save it to a thing!
-def save_csv(project,data,txt='raw'):
-    projdir = dirset(project)
-    fname = fset(txt)
-    fpath = projdir + fname
-    fields = data[0]._fields
-    print('writing {} rows to {}'.format(len(data),fpath))
-    with open(fpath,'w') as fp:
+
+# load destination directory, generating it if needed.
+# generate file name based on `file-spec`.
+# return full path to file to target file.
+def setup(project,settings):
+    dest = settings.get('directory','tmp/outputs/{}/'.format(project))
+    dest = dest if dest.endswith('/') else dest + '/'
+    if not path.isdir(dest):
+        os.makedirs(dest)
+    spec = settings.get('file-spec',{})
+    tag,stamp = spec.get('tag','export'),spec.get('timestamp',True)
+    name = tag + '-' + str(int(time.time())) if stamp else tag
+    filepath = dest + name + '.csv'
+    return filepath
+
+# saves all rows to the file specified by `filepath`.
+# automatically infers headers from the `_fields` method
+# of the `namedtuple` object.
+def save_csv(filepath,rows):
+    if not rows: return
+    fields = rows[0]._fields
+    print('writing {} rows to {}'.format(len(rows),filepath))
+    with open(filepath,'w') as fp:
         writer = csv.writer(fp)
         writer.writerow(fields)
-        for d in data: writer.writerow(d)
-
-# set up & return project output dir.
-def dirset(project):
-    projdir = 'tmp/outputs/{}/'.format(project)
-    if not path.isdir(projdir):
-        os.makedirs(projdir)
-    return projdir
-
-# set up & return file name.
-def fset(txt):
-    ft = str(int(time.time()))
-    fname = '{}-{}.csv'.format(txt,ft)
-    return fname
+        for row in rows:
+            writer.writerow(row)

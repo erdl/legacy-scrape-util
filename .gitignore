@@ -1,5 +1,6 @@
 # Project-Specific
 tmp/outputs/
+tmp/inputs/
 tmp/errors/
 state-files/
 

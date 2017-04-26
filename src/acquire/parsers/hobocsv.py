@@ -12,8 +12,6 @@ def parse(project,config,state,filepath):
     return state,rows
 
 
-
-
 def reformat_data(config,rawdata):
     title = rawdata.pop(0) # extract title row.
     hoboid = title[0].split(' ').pop() # extract id from title.
@@ -77,8 +75,5 @@ def parse_times(times,offset=None):
 def read_csv(filename):
     with open(filename) as fp:
         reader = csv.reader(fp)
-        title = next(reader) # get title row.
-        header = next(reader)
-        rows = list(reader)
-    # extract id from title row.
-    hoboid = title[0].split(' ').pop()
+        rows = [r for r in reader]
+    return rows

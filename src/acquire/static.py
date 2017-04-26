@@ -2,7 +2,7 @@
 from importlib import import_module
 from src.core.data_utils import Row
 from src.core.error_utils import error_template,mklog
-import src.core.file_utils as ft
+import src.core.file_utils as fu
 import os.path as path
 import os
 
@@ -10,11 +10,13 @@ static_error = error_template('`static` data-acquisition step')
 
 # primary entrr point: project -> config -> state -> (state,data)
 def acquire(project,config,state):
-    print('runnint `static` data-acquisition method...\n')
+    print('running `static` data-acquisition method...\n')
     # get contents of the `settings` field; defaults to empty dict.
     settings = config.get('settings',{})
     # get the list of parser specifications.
     parsers = config['parser']
+    # quick dir formatter.
+    dir_fmt = lambda d: d if d.endswith('/') else d + '/'
     # generate the default directory to move successfully parsed files to.
     fmt_default = settings.get('on-fmt','tmp/archive/{}/static/'.format(project))
     # generate the default directory to move unsuccessfully parsed files to.
@@ -23,32 +25,40 @@ def acquire(project,config,state):
     src_default = settings.get('source','tmp/inputs/{}/'.format(project))
     data = [] # collector for successufully generated rows.
     # iteratively run all parsers.
+    print(parsers) # DEBUG
     for spec in parsers:
         name = spec['parser'] # name of perser to use.
         print('running static file parser: {}\n'.format(name))
         parser = get_parser(name) # load specified parser.
-        on_fmt = spec.get('on-fmt',fmt_default) # fmt dest or default.
-        on_err = spec.get('on-err',err_default) # err dest or default.
-        source = spec.get('source',src_default) # file src or default.
+        on_fmt = dir_fmt(spec.get('on-fmt',fmt_default)) # fmt dest or default.
+        on_err = dir_fmt(spec.get('on-err',err_default)) # err dest or default.
+        source = dir_fmt(spec.get('source',src_default)) # file src or default.
         suffix = spec.get('suffix','*') # file suffix of targets.
         files = load_files(source,suffix) # files to parse.
         # iteratively parse all files, moving them to
         # `on_fmt` if no errors occur, and `on_err` if
         # an exception is raised by `parser`.
+        print('files: ',files) # DEBUG
         for fname in files:
+            fpath = source + fname
+            print('attempting to parse file: {}'.format(fname))
+            substate = state.get(name,{})
             try:
-                print('attempting to parse file: {}'.format(fname))
-                substate = state.pop(name,{})
-                substate,rows = parser.parse(spec,substate,fname)
+                substate,rows = parser.parse(project,spec,substate,fpath)
                 for r in rows: assert isinstance(r,Row)
                 data += rows
-                if substate: state[name] = substate
+                if substate:
+                    state[name] = substate
+                else: state.pop(name,None)
                 move_file(source,on_fmt,fname)
                 print('{} rows acquired during parsing...\n'.format(len(rows)))
             except Exception as err:
-                print('error while parsing {}: '.format(fname) + err)
+                # DEBUG
+                raise Exception(err) # DELETE THIS YO!
+                #/DEBUG
+                print('error while parsing {}: '.format(fname) + str(err))
                 print('moving target file to: {}\n'.format(on_err))
-                mklog(err)
+                mklog(project,err)
                 move_file(source,on_err,fname)
     return state,data
 

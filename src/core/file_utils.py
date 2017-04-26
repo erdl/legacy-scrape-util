@@ -114,7 +114,7 @@ def match_filetype(files,filetype):
     filetype = filetype.lower()
     matches = []
     for name in files:
-        ext = name.split('-').pop().lower()
+        ext = name.split('.').pop().lower()
         if ext == filetype:
-            name.append(matches)
+            matches.append(name)
     return matches
