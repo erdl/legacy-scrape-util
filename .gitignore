@@ -2,6 +2,7 @@
 tmp/outputs/
 tmp/inputs/
 tmp/errors/
+tmp/archive/
 state-files/
 
 # Byte-compiled / optimized / DLL files

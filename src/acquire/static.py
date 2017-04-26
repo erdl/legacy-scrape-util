@@ -53,9 +53,6 @@ def acquire(project,config,state):
                 move_file(source,on_fmt,fname)
                 print('{} rows acquired during parsing...\n'.format(len(rows)))
             except Exception as err:
-                # DEBUG
-                raise Exception(err) # DELETE THIS YO!
-                #/DEBUG
                 print('error while parsing {}: '.format(fname) + str(err))
                 print('moving target file to: {}\n'.format(on_err))
                 mklog(project,err)
