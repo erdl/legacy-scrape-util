@@ -3,6 +3,7 @@ from importlib import import_module
 from src.core.data_utils import Row
 from src.core.error_utils import error_template,mklog
 import src.core.file_utils as fu
+import time
 import os.path as path
 import os
 
@@ -15,14 +16,20 @@ def acquire(project,config,state):
     settings = config.get('settings',{})
     # get the list of parser specifications.
     parsers = config['parser']
-    # quick dir formatter.
-    dir_fmt = lambda d: d if d.endswith('/') else d + '/'
+    # quick dir formatter; appends '/' if needed, but passes `None`s.
+    dir_fmt = lambda d: (d if d.endswith('/') else d + '/') if d else d
+    # generate the default directory to find files to parse.
+    src_default = settings.get('source','tmp/inputs/{}/'.format(project))
     # generate the default directory to move successfully parsed files to.
     fmt_default = settings.get('on-fmt','tmp/archive/{}/static/'.format(project))
     # generate the default directory to move unsuccessfully parsed files to.
     err_default = settings.get('on-err','tmp/errors/{}/static/'.format(project))
-    # generate the default directory to find files to parse.
-    src_default = settings.get('source','tmp/inputs/{}/'.format(project))
+    # default directory to save data from parsed files individually
+    raw_default = settings.get('on-raw',False)
+    # an integer representing the current time; this is used by the
+    # `save_raw` function to ensure that files from different sources
+    # are all sorted by the same timestamp.
+    time_now = int(time.time())
     data = [] # collector for successufully generated rows.
     # iteratively run all parsers.
     print(parsers) # DEBUG
@@ -32,6 +39,7 @@ def acquire(project,config,state):
         parser = get_parser(name) # load specified parser.
         on_fmt = dir_fmt(spec.get('on-fmt',fmt_default)) # fmt dest or default.
         on_err = dir_fmt(spec.get('on-err',err_default)) # err dest or default.
+        on_raw = dir_fmt(spec.get('on-raw',raw_default)) # raw dest or default.
         source = dir_fmt(spec.get('source',src_default)) # file src or default.
         suffix = spec.get('suffix','*') # file suffix of targets.
         files = load_files(source,suffix) # files to parse.
@@ -50,6 +58,7 @@ def acquire(project,config,state):
                 if substate:
                     state[name] = substate
                 else: state.pop(name,None)
+                if on_raw: save_raw(on_raw,fname,rows)
                 move_file(source,on_fmt,fname)
                 print('{} rows acquired during parsing...\n'.format(len(rows)))
             except Exception as err:
@@ -58,6 +67,22 @@ def acquire(project,config,state):
                 mklog(project,err)
                 move_file(source,on_err,fname)
     return state,data
+
+
+# save a copy of the parsed data in "raw" form to a csv,
+# without any aggregation, reshaping, etc.  The data is
+# saved to a file with the same name as its source (if the
+# source file was not a csv, the `.csv` extension is added).
+def save_raw(directory,filename,rows):
+    # add `.csv` if filename is not a csv.
+    name = filename if filename.endswith('.csv') else filename + '.csv'
+    # generate destination directory if does not exist.
+    if not path.isdir(directory): os.makedirs(directory)
+    # generate full filepath for destination file.
+    filepath = directory + name
+    # use the default csv utility to save the rows.
+    fu.save_csv(filepath,rows)
+
 
 # move a file at src/name to dest/name.  If
 # strict is false, dest will be created if

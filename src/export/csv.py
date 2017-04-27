@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from src.core.error_utils import errdata,mklog
+import src.core.file_utils as fu
 import os.path as path
 import time
 import csv
@@ -14,7 +15,7 @@ def export(project,config,state,data):
     # directory if it does not yet exist.
     filepath = setup(project,settings)
     # save all data to the target file.
-    save_csv(filepath,data)
+    fu.save_csv(filepath,data)
     return state
 
 
@@ -31,16 +32,3 @@ def setup(project,settings):
     name = tag + '-' + str(int(time.time())) if stamp else tag
     filepath = dest + name + '.csv'
     return filepath
-
-# saves all rows to the file specified by `filepath`.
-# automatically infers headers from the `_fields` method
-# of the `namedtuple` object.
-def save_csv(filepath,rows):
-    if not rows: return
-    fields = rows[0]._fields
-    print('writing {} rows to {}'.format(len(rows),filepath))
-    with open(filepath,'w') as fp:
-        writer = csv.writer(fp)
-        writer.writerow(fields)
-        for row in rows:
-            writer.writerow(row)

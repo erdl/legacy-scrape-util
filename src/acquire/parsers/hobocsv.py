@@ -6,15 +6,18 @@ import csv
 # list required configuration fields
 REQUIRE = []
 
+# primary entry point of this parser.
 def parse(project,config,state,filepath):
     rawdata = read_csv(filepath)
     rows = reformat_data(config,rawdata)
     return state,rows
 
-
+# reformat raw data into `Row` objects.
 def reformat_data(config,rawdata):
     title = rawdata.pop(0) # extract title row.
+    print('title-string: ',title) # DEBUG
     hoboid = title[0].split(' ').pop() # extract id from title.
+    print('hobo-id: ',hoboid) # DEBUG
     node = 'hobo-{}'.format(fmt_string(hoboid))
     rows = [r[1:] for r in rawdata] # remove col 1 (row numbers).
     headers = rows.pop(0) # extract headers.
@@ -31,7 +34,7 @@ def reformat_data(config,rawdata):
     return formatted
 
 
-
+# extract important header data.
 def parse_headers(headers):
     # split up headers to separate out names.
     split = [h.split(', ') for h in headers]
@@ -54,7 +57,7 @@ def parse_headers(headers):
     mapping = list(zip(names,units))
     return timezone,mapping
 
-
+# parse the hobo-u12 time encoding.
 def parse_times(times,offset=None):
     fmt = '%m/%d/%y %I:%M:%S %p'
     if offset:

@@ -1,8 +1,10 @@
 [acquire.static.settings]
 is-active = true
-source = 'tmp/inputs/hobo-u12/'
-on-fmt = 'tmp/archive/hobo-u12/'
-on-err = 'tmp/errors/hobo-u12/'
+source = 'tmp/inputs/hobo-u12/' # default: `tmp/inputs/project-name/`
+on-fmt = 'tmp/archive/hobo-u12/' # default: `tmp/archive/project-name/`
+on-err = 'tmp/errors/hobo-u12/' # default: `tmp/errors/project-name/`
+on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
+
 
 [[acquire.static.parser]]
 parser = "hobocsv"
