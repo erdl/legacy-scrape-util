@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from importlib import import_module
 from src.core.data_utils import Row
 from src.core.error_utils import error_template,mklog
 import src.core.file_utils as fu
+import src.core.pgrm_utils as pu
 import time
 import os.path as path
 import os
@@ -118,9 +118,9 @@ def load_files(source,suffix):
 # attempts to load the specified parser.
 def get_parser(parser):
     mkerr = static_error('loading static file parser: ' + parser)
-    modname = 'src.acquire.parsers.{}'.format(parser).lower()
+    modname = 'src.acquire.parsers.{}'.format(parser)
     try:
-        mod = import_module(modname)
+        mod = pu.get_module(modname)
     except:
         error = mkerr('failed to load parser module: ' + parser)
         raise Exception(error)

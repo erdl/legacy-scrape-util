@@ -7,7 +7,7 @@ on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
 
 
 [[acquire.static.parser]]
-parser = "hobocsv"
+parser = "hobo-u12-csv"
 suffix = "csv"
 
 [export.csv.settings]
