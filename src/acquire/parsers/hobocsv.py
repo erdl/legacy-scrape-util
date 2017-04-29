@@ -16,7 +16,7 @@ def parse(project,config,state,filepath):
 def reformat_data(config,rawdata):
     title = rawdata.pop(0) # extract title row.
     print('title-string: ',title) # DEBUG
-    hoboid = title[0].split(' ').pop() # extract id from title.
+    hoboid = title[0].split(' ').pop().replace('"','') # extract id from title.
     print('hobo-id: ',hoboid) # DEBUG
     node = 'hobo-{}'.format(fmt_string(hoboid))
     rows = [r[1:] for r in rawdata] # remove col 1 (row numbers).
