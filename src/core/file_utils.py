@@ -2,6 +2,7 @@
 import os.path as path
 import toml
 import json
+import csv
 import os
 
 # various utilities used for file io,
@@ -118,3 +119,29 @@ def match_filetype(files,filetype):
         if ext == filetype:
             matches.append(name)
     return matches
+
+# saves all rows to the file specified by `filepath`.
+# automatically infers headers from the `_fields` method
+# of the `namedtuple` object.  can be optionally set to
+# `append` mode, which appends the data & skips writing
+# header names if the target csv already exists.
+def save_csv(filepath,rows,append=False):
+    if not rows: return
+    # get the field names of our data.
+    fields = rows[0]._fields
+    # if append is true and the file already exists, set
+    # mode to `append`, else set mode to `write`.
+    mode = 'a' if append and path.isfile(filepath) else 'w'
+    # make sure the user is appraised of a file being written.
+    print('writing {} rows to {}'.format(len(rows),filepath))
+    # open the file with the appropraite mode.
+    with open(filepath,mode) as fp:
+        # let the `csv` module handle formatting.
+        writer = csv.writer(fp)
+        # if we are writing to a new file, we should
+        # write the field names as our first row.
+        if mode == 'w':
+            writer.writerow(fields)
+        # iteratively write all rows to our file.
+        for row in rows:
+            writer.writerow(row)

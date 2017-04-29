@@ -3,6 +3,8 @@ is-active = true
 source = '/usr/local/smb-share/hobo-12-raw/inputs/'
 on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
 on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
+on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
+
 
 [[acquire.static.parser]]
 parser = "hobocsv"
