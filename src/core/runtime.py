@@ -81,6 +81,7 @@ def acquire_data(project,config,state):
             print('(flagged as inactive)\n')
             continue
         substate = state.get(method,{})
+        subconf = config[method] if isinstance(config[method],dict) else {}
         scraper = get_util('acquire',method)
         substate,rows = scraper.acquire(project,config[method],substate)
         data += rows
@@ -108,7 +109,8 @@ def reshape_data(project,config,state,data):
     # run all reshape utilities across data.
     for rs in rord:
         substate = state.get(rs,{})
-        substate,data = rutils[rs].reshape(project,config[rs],substate,data)
+        subconf = config[rs] if isinstance(config[rs],dict) else {}
+        substate,data = rutils[rs].reshape(project,subconf,substate,data)
         if substate: state[rs] = substate
         else: state.pop(rs,None)
     return state,data
@@ -124,9 +126,10 @@ def export_data(project,config,state,data):
     for kind in config:
         if not is_active(config[kind]): continue
         substate = state.get(kind,{})
+        subconf = config[kind] if isinstance(config[kind],dict) else {}
         # load & run specified export utility.
         exutil = get_util('export',kind)
-        substate = exutil.export(project,config[kind],substate,data)
+        substate = exutil.export(project,subconf,substate,data)
         if substate: state[kind] = substate
         else: state.pop(kind,None)
     return state

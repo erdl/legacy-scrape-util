@@ -1,8 +1,8 @@
 [acquire.static.settings]
 is-active = true
-source = 'tmp/inputs/hobo-u12/'
-on-fmt = 'tmp/archive/hobo-u12/'
-on-err = 'tmp/errors/hobo-u12/'
+source = '/usr/local/smb-share/hobo-12-raw/inputs/'
+on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
+on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
 
 [[acquire.static.parser]]
 parser = "hobocsv"
@@ -10,5 +10,5 @@ suffix = "csv"
 
 [export.csv.settings]
 is-active = true
-directory = 'tmp/outputs/hobo-u12/'
+directory = '/usr/local/smb-share/hobo-12-raw/outputs/'
 file-spec = { tag = 'u12-data', timestamp = true }
