@@ -11,6 +11,22 @@ import os
 # all, or some subset, of active projects.
 def run_cli():
     args = get_args()
+    rslt = {}
+    if not args['action']:
+        print('no action specified... run with `-h` for more info.')
+    elif args['action'] == 'new':
+        new_project(args)
+    elif args['action'] == 'run':
+        rslt['projects'] = assemble_projects(args['projects'])
+    else:
+        print('unrecognized action: ',args['action'])
+    if 'mode' in args:
+        rslt['mode'] = args['mode']
+    return rslt
+
+def handle_args(args):
+
+    args = get_args()
     if not args['action']:
         print('no action specified... run with `-h` for more info.')
         return []
@@ -34,6 +50,8 @@ def get_args():
     runproj = action.add_parser('run')
     runproj.add_argument('-p','--projects',default=['all'],
         help = 'project(s) to run',type=str,nargs='+')
+    runproj.add_argument('-m','--mode',default=['cli'],
+        options=['cli','cron'])
     # parser for the `new` action.
     newproj = action.add_parser('new')
     newproj.add_argument('project_name',type=str,

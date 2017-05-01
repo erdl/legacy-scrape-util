@@ -6,18 +6,20 @@ import src.core.cli_utils as cli_utils
 
 # primary entry point of runtime; handles
 # launch of various possible execution modes.
-def run(mode='cli'):
+def run():
     # `cli` mode allows user to interactively list which
     # projects to run, and/or make a new project template.
+    args = cli_utils.run_cli()
+    projects = args.get('projects',[])
+    if not projects: return
+    mode = args.get('mode','cli')
     if mode == 'cli':
-        projects = cli_utils.run_cli()
         for proj in projects:
             run_project(proj)
     # `cron` mode runs all existent projects via
     # the `run_wrapped` method which causes any
     # exceptions to be logged to a txt file.
     elif mode == 'cron':
-        projects = file_utils.get_projects()
         for proj in projects:
             run_wrapped(proj)
     else:

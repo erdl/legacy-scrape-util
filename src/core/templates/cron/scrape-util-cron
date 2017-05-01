@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from importlib import import_module
 import os
 
 # set this variable to the absolute path
@@ -12,8 +11,7 @@ DIRECTORY = '.'
 # project from brining down the rest).
 def run_cron():
     os.chdir(DIRECTORY)
-    runtime = import_module('src.core.runtime')
-    runtime.run(mode='cron')
+    os.system('./scrape-util run -m cron')
 
 if __name__ == '__main__':
     run_cron()
