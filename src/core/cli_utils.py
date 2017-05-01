@@ -51,7 +51,7 @@ def get_args():
     runproj.add_argument('-p','--projects',default=['all'],
         help = 'project(s) to run',type=str,nargs='+')
     runproj.add_argument('-m','--mode',default=['cli'],
-        options=['cli','cron'])
+        choices=['cli','cron'])
     # parser for the `new` action.
     newproj = action.add_parser('new')
     newproj.add_argument('project_name',type=str,
