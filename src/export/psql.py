@@ -13,7 +13,7 @@ def export(project,config,state,data):
     duplicates = []
     primarykey = settings.get('primary-key',None)
     if primarykey:
-        data,dups = enforce_key(data,key)
+        data,dups = enforce_key(data,primarykey)
         duplicates += dups
     # handle custom-inserion instance if needed.
     if 'conversions' in config:
