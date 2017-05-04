@@ -25,7 +25,6 @@ def run_cli():
     return rslt
 
 def handle_args(args):
-
     args = get_args()
     if not args['action']:
         print('no action specified... run with `-h` for more info.')
@@ -50,7 +49,7 @@ def get_args():
     runproj = action.add_parser('run')
     runproj.add_argument('-p','--projects',default=['all'],
         help = 'project(s) to run',type=str,nargs='+')
-    runproj.add_argument('-m','--mode',default=['cli'],
+    runproj.add_argument('-m','--mode',default='cli',
         choices=['cli','cron'])
     # parser for the `new` action.
     newproj = action.add_parser('new')

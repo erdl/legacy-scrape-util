@@ -33,38 +33,90 @@ def reshape(project,config,state,data):
 # Filter out undesired data-points, either
 # by name of data-point, or by value range.
 def run_filters(project,config,state,data):
+    if not data: return state,data
     settings = config['settings']
     filters = config['filter']
+    # binary filters to be applied by uid.
     binary = {k: v for k,v in filters.items() if isinstance(v,bool)}
-    limits = {k: v for k,v in filters.items() if isinstance(v,dict)}
+    # limiting filters to be applied by uid.
+    limits = {k: v for k,v in filters.items() if
+            isinstance(v,dict) and not k in data[0]._fields}
+    # limiting filters to be applied by field.
+    fields = {k: v for k,v in filters.items() if
+            isinstance(v,dict) and k in data[0]._fields}
+    # dictionary of all rows sorted by their uid.
     uidsort = sort_by_uid(settings,data)
-    removed = []
+    # collectors for rows based on removal
+    keep,remove = [],[]
+    # run binary filters, removing all uids
+    # which have been flagged as `false`.
     for uid in binary:
         if binary[uid] is False:
-            removed += uidsort.pop(uid,())
+            remove += uidsort.pop(uid,())
+    # run limiting filters on all uids for which
+    # one or more limiting filters are specified.
     for uid in limits:
         if not uid in uidsort: continue
         rows = uidsort[uid]
-        if 'dec' in limits[uid]:
-            places = limits[uid]['dec']
-            if places == 0:
-                fltr = lambda r: int(round(r,places))
-            else: fltr = lambda r: round(r,places)
-            rows = du.map_rows(fltr,'value',rows)
-        if 'max' in limits[uid]:
-            fltr = lambda v: v <= limits[uid]['max']
-            rows,remove = du.split_rows(fltr,rows,target='value')
-            removed += remove
-        if 'min' in limits[uid]:
-            fltr = lambda v: v >= limits[uid]['min']
-            rows,remove = du.split_rows(fltr,rows,target='value')
-            removed += remove
+        rows,rems = limiting_filters(limits[uid],rows,target='value')
         uidsort[uid] = rows
-    filtered = []
+        remove += rems
+    # re-concolidate remaining contents of `uidsort`
+    # into the `keep` list.
     for rows in uidsort.values():
-        filtered += rows
-    handle_removals(project,config,'filter',removed)
-    return state,filtered
+        keep += rows
+    # run limiting filters on all fields for which
+    # one or more limiting filters are specified.
+    for field,spec in fields.items():
+        keep,rem = limiting_filters(spec,keep,target=field)
+        remove += rem
+    # TEST: ensure that no filters are causing silent removals.
+    assert len(data) == (len(keep) + len(remove))
+    # deal with removed rows as specified in config.
+    handle_removals(project,config,'filter',remove)
+    return state,keep
+
+
+def limiting_filters(spec,rows,target='value'):
+    if not rows: return
+    keep,remove = rows,[]
+    # filter out trailing decimal places in `target`.
+    if 'dec' in spec:
+        if spec['dec'] == 0:
+            fltr = lambda r: int(round(float(r),0))
+        else: fltr = lambda r: round(float(r),spec['dec'])
+        keep = du.map_rows(fltr,target,keep)
+    # filter out rows with too large of a value in `target`.
+    if 'max' in spec:
+        fltr = lambda v: v <= spec['max']
+        keep,rem = du.split_rows(fltr,keep,target=target)
+        remove += rem
+    # filter out rows with too small a value in `target`.
+    if 'min' in spec:
+        fltr = lambda v: v >= spec['min']
+        keep,rem = du.split_rows(fltr,keep,target=target)
+        remove += rem
+    # filter out rows where the value of `target` does not
+    # start with and of the expected characters strings.
+    if 'head' in spec:
+        head = spec['head']
+        if not isinstance(head,list): head = [head]
+        fltr = lambda v: any((str(v).startswith(h) for h in head))
+        keep,rem = du.split_rows(fltr,keep,target=target)
+        remove += rem
+    # filter out rows where the value of `target` does not
+    # end with and of the expected characters strings.
+    if 'tail' in spec:
+        tail = spec['tail']
+        if not isinstance(tail,list): tail = [tail]
+        fltr = lambda v: any((str(v).endswith(t) for t in tail))
+        keep,rem = du.split_rows(fltr,keep,target=target)
+        remove += rem
+    # TEST: ensure that no filters are causing silent removals.
+    assert len(rows) == (len(keep) + len(remove))
+    return keep,remove
+
+
 
 
 # Generate one or more new sets of data-points

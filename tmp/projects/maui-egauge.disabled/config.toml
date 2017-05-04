@@ -1,0 +1,67 @@
+# Configurations for the `maui-egauge` project.
+
+# ACQUIRE CONFIGURATIONS
+[acquire.egauge.settings]
+is-active = true
+
+[acquire.egauge.gauges]
+maui-smart-grid = 787
+
+
+# RESHAPE CONFIGURATIONS
+
+# VALUE RESHAPING
+[reshape.value.settings]
+is-active = true
+to-replace = "name"
+uid-key = ["name"]
+in-order = ["filter","replace"]
+
+[reshape.value.filter]
+generation = false
+timestamp = { dec = 0, tail = "00" }
+
+[reshape.value.replace]
+"usage" = 31
+"plug loads" = 32
+"whole panel" = 33
+"lights" = 34
+"fans" = 35
+"mauka portable (P7B AC)" = 36
+"makai portable (P7A AC)" = 37
+
+# FIELD RESHAPING
+[reshape.field.settings]
+is-active = true
+on-modify = "discard" # "discard" || "archive"
+in-order = ["modify","generate"] # default: ["modify","generate"]
+
+[reshape.field.modify]
+name = { title = "purpose_id", index = 1 }
+unit = { title = "units", index = 2 }
+value = { title = "reading", index = 3 }
+timestamp = { title = "datetime", index = 0 }
+
+[[reshape.field.generate]]
+value = "current-time"
+title = "upload_timestamp"
+index = "append" # default: "append"
+round = 0 # default: 6
+
+
+# EXPORT CONFIGURATIONS
+
+# GENERAL
+[export]
+csv = true
+
+# PSQL EXPORT
+[export.psql.settings]
+is-active = false
+database = "maui"
+table = "reading"
+primary-key = ["datetime","purpose_id"]
+
+[export.psql.conversions]
+datetime = "to-timestamp"
+upload_timestamp = "to-timestamp"

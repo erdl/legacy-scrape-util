@@ -23,7 +23,7 @@ def run():
         for proj in projects:
             run_wrapped(proj)
     else:
-        raise Exception('unrecognized mode: ' + mode)
+        raise Exception('unrecognized mode: ' + str(mode))
 
 # wrapper around `run_project` which catches
 # and logs any errors that arise during the

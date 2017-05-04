@@ -38,7 +38,7 @@ def run_modifications(project,config,state,data):
     # TODO: add an `on-modify` handler for options `discard` & `archive`
     fieldmap = config['modify']
     mkerr = field_error('field name & order reassignment')
-    if not data: return []
+    if not data: return state,data
     fieldmap = { k.lower() : fieldmap[k] for k in fieldmap }
     dfields  = data[0]._fields
     for field in fieldmap:
@@ -89,7 +89,8 @@ def generate_current_time(project,config,state,rows):
     mkerr = field_error('generating field: `current-time`')
     title = config['title']
     index = config.get('index',"append")
-    now = round(time.time(),config.get('round',6))
+    dec = config.get('round',6)
+    now = round(time.time(),dec) if dec > 0 else int(time.time())
     if isinstance(index,str):
         if index == "append":
             fmt = lambda v,r: list(r) + [v]
