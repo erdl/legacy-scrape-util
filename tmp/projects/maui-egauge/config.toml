@@ -57,7 +57,7 @@ csv = true
 
 # PSQL EXPORT
 [export.psql.settings]
-is-active = false
+is-active = true
 database = "maui"
 table = "reading"
 primary-key = ["datetime","purpose_id"]
