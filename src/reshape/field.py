@@ -45,31 +45,41 @@ def run_modifications(project,config,state,data):
         if field not in dfields:
             error = mkerr('unrecognized field: ' + field)
             raise Exception(error)
+    types = {'int':int,'float':float,'str':str,'bool':bool,'none':lambda v:v}
     indexmap = []
     namemap  = []
+    typemap  = []
     for di,df in enumerate(dfields):
         if not df in fieldmap: continue
         mf = fieldmap[df]['title']
         mi = fieldmap[df]['index']
+        mt = fieldmap[df].get('type','none')
+        if not mt in types:
+            error = mkerr('unrecognized type: ' + str(mt))
+            raise Exception(error)
         indexmap.append((mi,di))
         namemap.append((mi,mf))
+        typemap.append((mi,mt))
     sbi = lambda i: i[0]
     foi = lambda l: [x[1] for x in l]
     indexmap = foi(sorted(indexmap,key=sbi))
     namemap  = foi(sorted(namemap,key=sbi))
+    typemap  = foi(sorted(typemap,key=sbi))
     fmtrow   = namedtuple('fmtrow', namemap)
     fmtdata  = []
     for d in data:
         row = []
         for i in indexmap:
             row.append(d[i])
+        for i,t in enumerate(typemap):
+            row[i] = types[t](row[i])
         fmtdata.append(fmtrow(*row))
     return state,fmtdata
 
 
 # run all specified `generate` steps.
 def run_generators(project,config,state,data):
-    if not data: return
+    if not data: return state,data
     generators = config['generate']
     settings = config.get('settings',{})
     mkerr = field_error('generating new fields')

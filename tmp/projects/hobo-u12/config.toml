@@ -1,8 +1,8 @@
 [acquire.static.settings]
 is-active = true
-source = '/usr/local/smb-share/hobo-12-raw/inputs/'
-on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
-on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
+#source = '/usr/local/smb-share/hobo-12-raw/inputs/'
+#on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
+#on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
 on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
 
 
@@ -10,7 +10,47 @@ on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
 parser = "hobo-u12-csv"
 suffix = "csv"
 
+
+# VALUE RESHAPING
+[reshape]
+# the value-based reshaping configurations have been
+# moved to `value-map.toml` for clarity/organization.
+value-file = "value-map"
+
+# FIELD RESHAPING
+[reshape.field.settings]
+is-active = true
+on-modify = "discard" # "discard" || "archive"
+in-order = ["modify","generate"] # default: ["modify","generate"]
+
+[reshape.field.modify]
+name = { title = "purpose_id", index = 1, type = "int" }
+unit = { title = "units", index = 2, type = "str" }
+value = { title = "reading", index = 3, type = "float" }
+timestamp = { title = "datetime", index = 0, type = "int" }
+
+[[reshape.field.generate]]
+value = "current-time"
+title = "upload_timestamp"
+index = "append" # default: "append"
+round = 2 # default: 6
+
+
+# EXPORT CONFIGURATIONS
+
+# CSV EXPORT
 [export.csv.settings]
 is-active = true
-directory = '/usr/local/smb-share/hobo-12-raw/outputs/'
+#directory = '/usr/local/smb-share/hobo-12-raw/outputs/'
 file-spec = { tag = 'u12-data', timestamp = true }
+
+# PSQL EXPORT
+[export.psql.settings]
+is-active = false
+database = "maui"
+table = "reading"
+primary-key = ["datetime","purpose_id"]
+
+[export.psql.conversions]
+datetime = "to-timestamp"
+upload_timestamp = "to-timestamp"

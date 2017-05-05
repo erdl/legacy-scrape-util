@@ -1,0 +1,53 @@
+# This file contains the mappings for value-based
+# reshapings to be performed on the hobo-u12 data
+# acquired during the maui smart grid project.
+
+
+# GENERAL CONFIGURATIONS
+[settings]
+is-active = true
+to-replace = ["name","unit"]
+uid-key = ["node","name"]
+in-order = ["filter","replace"]
+
+
+# VALUE-BASED FILTERING
+[filter]
+# round all timestamps to nearest whole number,
+# and filter out any which are not on the minute
+# mark (ending in `00.0`).
+#timestamp = { dec = 0, tail = "00.0" }
+
+
+# VALUE-BASED REPLACEMENT
+[replace]
+hobo-4-9790163-rh = [ "14", "%"]
+hobo-2-9796088-temp = [ "2", "F"]
+hobo-1-10688126-intensity = [ "21", "lum/ft2"]
+hobo-7-9796085-intensity = [ "27", "lum/ft2"]
+hobo-10-10688123-temp = [ "10", "F"]
+hobo-6-10688125-intensity = [ "26", "lum/ft2"]
+hobo-4-9790163-temp = [ "4", "F"]
+hobo-5-9796121-temp = [ "5", "F"]
+hobo-7-9796085-temp = [ "7", "F"]
+hobo-10-10688123-intensity = [ "30", "lum/ft2"]
+hobo-2-9796088-rh = [ "12", "%"]
+hobo-3-10688127-intensity = [ "23", "lum/ft2"]
+hobo-1-10688126-rh = [ "11", "%"]
+hobo-8-9796091-intensity = [ "28", "lum/ft2"]
+hobo-3-10688127-temp = [ "3", "F"]
+hobo-4-9790163-intensity = [ "24", "lum/ft2"]
+hobo-8-9796091-rh = [ "18", "%"]
+hobo-6-10688125-temp = [ "6", "F"]
+hobo-5-9796121-rh = [ "15", "%",]
+hobo-2-9796088-intensity = [ "22", "lum/ft2"]
+hobo-10-10688123-rh = [ "20", "%"]
+hobo-7-9796085-rh = [ "17", "%"]
+hobo-9-9796110-intensity = [ "29", "lum/ft2"]
+hobo-9-9796110-temp = [ "9", "F"]
+hobo-5-9796121-intensity = [ "25", "lum/ft2"]
+hobo-6-10688125-rh = [ "16", "%"]
+hobo-3-10688127-rh = [ "13", "%"]
+hobo-1-10688126-temp = [ "1", "F"]
+hobo-9-9796110-rh = [ "19", "%"]
+hobo-8-9796091-temp = [ "8", "F"]

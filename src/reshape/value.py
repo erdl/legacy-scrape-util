@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from src.core.error_utils import errdata, error_template
 import src.core.data_utils as du
+import src.core.file_utils as fu
 
 # Determines order of application
 # during mulit-phase reshaping process.
@@ -18,6 +19,7 @@ def reshape(project,config,state,data):
     else: order = [a for a in actions if a in config]
     errors = []
     for action in order:
+        scount = len(data)
         substate = state[action] if action in state else {}
         if action == 'filter':
             substate,data = run_filters(project,config,substate,data)
@@ -28,6 +30,9 @@ def reshape(project,config,state,data):
         else: raise Exception('unknown action: ' + action)
         if substate: state[action] = substate
         else: state.pop(action,None)
+        ecount = len(data)
+        diff = scount - ecount
+        if diff: print('{} rows removed during {} step.'.format(diff,action))
     return state,data
 
 # Filter out undesired data-points, either
@@ -82,9 +87,7 @@ def limiting_filters(spec,rows,target='value'):
     keep,remove = rows,[]
     # filter out trailing decimal places in `target`.
     if 'dec' in spec:
-        if spec['dec'] == 0:
-            fltr = lambda r: int(round(float(r),0))
-        else: fltr = lambda r: round(float(r),spec['dec'])
+        fltr = lambda r: round(float(r),spec['dec'])
         keep = du.map_rows(fltr,target,keep)
     # filter out rows with too large of a value in `target`.
     if 'max' in spec:
@@ -203,11 +206,13 @@ def run_replacements(project,config,state,data):
     replacements = {du.fmt_string(k): v for k,v in config['replace'].items()}
     settings = config.get('settings',{})
     uidsort = sort_by_uid(settings,data)
-    target = settings.get('to-replace',None)
+    target = settings.get('to-replace',[])
+    if not isinstance(target,list):
+        target = [target]
     remapped = []
     for uid in replacements:
         umap = replacements[uid]
-        if target: umap = { target: umap }
+        if target: umap = {k:v for k,v in zip(target,umap)}
         rows = uidsort.pop(uid,[])
         remap = lambda row: du.update_row(umap,row)
         newrows = list(map(remap,rows))
@@ -250,7 +255,7 @@ def handle_removals(project,config,step,rows):
     action = config['settings'][key]
     if action == 'discard': return
     elif action == 'archive':
-        du.save_archive(project,step,rows)
+        fu.save_archive(project,step,rows)
     elif action == 'error':
         errdata(project,rows,txt = step + 'err')
     else:

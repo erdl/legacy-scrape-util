@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os.path as path
+import time
 import toml
 import json
 import csv
@@ -119,6 +120,15 @@ def match_filetype(files,filetype):
         if ext == filetype:
             matches.append(name)
     return matches
+
+# archiving shortcut for steps which archive rows,
+# e.g.; when removed during value-based filtering.
+def save_archive(project,step,rows):
+    name = str(step) + '-' + str(int(time.time()))
+    path = 'tmp/archive/{}/'.format(project)
+    filepath = path + name + '.csv'
+    save_csv(filepath,rows,append=True)
+
 
 # saves all rows to the file specified by `filepath`.
 # automatically infers headers from the `_fields` method
