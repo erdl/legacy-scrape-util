@@ -173,3 +173,39 @@ def split_rows(fn,rows,target=None,rowtype=Row):
         if fltr(row): passed.append(row)
         else: failed.append(row)
     return passed,failed
+
+
+# generic nonce updater/generator.  This is an experimental
+# attempt to provide a single standardized handler for nonce
+# values.  Consider this an unstable API feature.
+# requires, at a minimum, a `targets` dict of the form
+# `{ 'some-uid': {}, ... }`.
+def make_time_specs(targets,settings={},nonce={}):
+    # integer representing the current time.
+    now = int(time.time())
+    # get init time for nonces; default is two weeks into the past.
+    init = settings.get('init-time',now - 1209600)
+    # get maximum step time; default is two weeks.
+    step = settings.get('step-time',1209600)
+    # generate a dict specifying init time and maximum viable step
+    # length for a given uid.  the maximum step length must be individually
+    # calculated, as some `nonce` values may be more recent than `now` - `step`.
+    mkspec = lambda i,s: { 'init': i, 'step': min((now,i + s)) - i }
+    times = {} # collector for the final values to be returned.
+    # iteratively generate time-spec for each uid in `targets`.
+    for uid,spec in targets.items():
+        # handle common pattern of dict/table being set to `true` or
+        # `"default"` to indicate that default values should be inferred.
+        spec = spec if isinstance(spec,dict) else {}
+        # use target-specific `step` if exists, else default.
+        tstep = spec.get('step',step)
+        # use nonce value for `init` if exists, else use
+        # target-specific val if exists, else default.
+        tinit = nonce.get(uid,spec.get('init',init))
+        # insert the time-spec under the given uid.
+        times[uid] = mkspec(int(tinit),int(tstep))
+    # quick sanity check.
+    assert len(targets) == len(times)
+    # pass back the time values.  implementation is responsible
+    # for updating the actual nonce after scrape attempt.
+    return times

@@ -200,22 +200,42 @@ def check_generators(project,generators):
         checked.append(new)
     return checked
 
-# Map itentiy-level values to new identity-level
-# values (eg; name="foo" to name="bar").
+# run identity-level replacements (e.g.; name="foo" to
+# name="bar").
 def run_replacements(project,config,state,data):
+    if not data: return state,data # handle no-rows case.
+    # generate a basic error message template for this section.
+    mkerr = reshape_error("running value-based replacement operations")
+    # generate the dict of replacements from the `replace` spec.
     replacements = {du.fmt_string(k): v for k,v in config['replace'].items()}
-    settings = config.get('settings',{})
-    uidsort = sort_by_uid(settings,data)
-    target = settings.get('to-replace',[])
-    if not isinstance(target,list):
-        target = [target]
-    remapped = []
-    for uid in replacements:
-        umap = replacements[uid]
-        if target: umap = {k:v for k,v in zip(target,umap)}
+    settings = config.get('settings',{}) # get handle to `settings`.
+    uidsort = sort_by_uid(settings,data) # sort rows by their uids.
+    target = settings.get('to-replace',[]) # get target spec if it exists.
+    # if only one target is declared, ensure it is still in list form.
+    target = target if isinstance(target,list) else [target]
+    remapped = [] # collector for successfully remapped rows.
+    # iteratively run replacements on all rows.
+    for uid,umap in replacements.items():
+        if not umap: continue # skip empty mappings & mappings set to `false`.
+        # if only one target is declared, ensure it is still in list form.
+        if not isinstance(umap,dict) and not isinstance(umap,list):
+            umap = [umap]
+        # if target(s) are in list form, them to their dict form.
+        if isinstance(umap,list):
+            # list-form mappings must be of same size as `target`.
+            if not target or len(umap) != len(target):
+                error = mkerr('''arguments should be of equal size:
+                    `to-replace`: {}\n     `{}`: {}'''.format(target,uid,umap))
+                raise Exception(error)
+            # expand umap into the form: `{'field': value}`.
+            umap = {f:v for f,v in zip(target,umap)}
+        # get all rows that match `uid`.
         rows = uidsort.pop(uid,[])
+        # generate a handy-dandy row converter.
         remap = lambda row: du.update_row(umap,row)
+        # remap rows to their new form.
         newrows = list(map(remap,rows))
+        # add remapped rows to the collector.
         remapped += newrows
     # if any rows remain in uidsort, pass off to handler.
     if uidsort:

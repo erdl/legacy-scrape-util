@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from src.core.data_utils import Row, get_uid_generator, check_config
+from src.core.data_utils import Row, get_uid_generator, check_config, make_time_specs
 from src.core.error_utils import error_template
 import requests
 import time
@@ -10,45 +10,62 @@ webctrl_error = error_template('`webctrl` data-acquisition step')
 # Primary entry point for webctrl scrape.
 # Returns data & updated state.
 def acquire(project,config,state):
-    # check that config is valid, and generate
-    # start/stop times for all query points.
-    starts,stops = setup(project,config,state)
-    sensors = config['sensor']
+    # check that config is valid, parse sensor
+    # parameters, and generate time specifications
+    # for all active sensors.
+    params,times = setup(project,config,state)
+    # generate a wrapper around `exec_query` with
+    # user-supplied configurations pre-applied.
     query = new_query(config['settings'])
-    mkuid = get_uid_generator()
-    # initialize the nonce as a copy of `starts`.
-    nonce = {k:v for k,v in starts.items()}
-    data = []
-    for sensor in sensors:
-        if not sensor.get('is-active',True): continue
-        name,path = sensor['name'], sensor['path']
-        node = sensor.get('node',project)
-        unit = sensor.get('unit','undefined')
-        code = mkuid((node,name,unit))
-        start,stop = starts[code],stops[code]
-        result = query(path,start,stop)
-        mkrow = lambda t,v: Row(node,name,unit,float(t//1000),float(v))
+    # initialize collectors for formatted
+    # data and the new `nonce` values.
+    nonce,data = {},[]
+    # iteratively scrape all sensors.
+    for uid,spec in params.items():
+        # break out the webctrl-path and identity values from `spec`.
+        path,*ident = (spec[k] for k in ('path','node','name','unit'))
+        # pull start-time and maximum step from `times`.
+        start,step = times[uid]['init'],times[uid]['step']
+        # query webctrl at `path` from `start` to `start` + `step`.
+        result = query(path,start,(start+step))
+        # make a generator for the `Row` type based
+        # on the supplied identity variables.
+        mkrow = lambda t,v: Row(*ident,float(t//1000),float(v))
+        # pass row generator and raw query-result to parser.
         rows = parse_rows(mkrow,result)
-        if not rows: continue
+        # in the event of an empty query, set `start` value
+        # as the new nonce, so we start from same place next time.
+        if not rows:
+            nonce[uid] = start
+            continue
+        # filter rows by timestamp.
         fltr = lambda r: r.timestamp
-        nonce[code] = max(rows,key=fltr).timestamp
-        data += rows
+        # set most recent timestamp as the new `nonce` value.
+        nonce[uid] = max(rows,key=fltr).timestamp
+        data += rows # add our rows to `data`.
+    # add newly generate `nonce` to `state`, overwriting
+    # old value if it exists.
     state['nonce'] = nonce
+    # fin ;)
     return state,data
+
 
 # parse rows from raw webctrl data, removing erroneous data
 # and duplicates (the webctrl bulk-trend server periodically
 # returns duplicate values for a given timestamp...).
 def parse_rows(mkrow,data):
+    # extract timestamp & value, passing them to supplied row generator,
+    # and filter out erroneous values (indicated by `'?'` in webctrl data).
     raw_rows = [mkrow(r['t'],r['a']) for r in data if not '?' in r.values()]
-    rows,times,dups = [],[],[]
+    rows,times,dups = [],[],[] # instantiate collectors.
+    # iterate over rows, sorting out duplicates by timestamp.
     for row in raw_rows:
         t = row.timestamp
         if not t in times:
             times.append(t)
             rows.append(row)
         else: dups.append(row)
-    # TODO: optionally save duplicates to a special archive.
+    # TODO: optionally save duplicates to archive.
     return rows
 
 
@@ -64,27 +81,39 @@ def setup(project,config,state):
     # if `config` checks out, we can assess `state`
     # and add/update any missing missing values.
     nonce = state.get('nonce',{})
-    start,stop = setup_times(project,config,nonce)
-    return start,stop
+    params,times = setup_parameters(project,config,nonce)
+    return params,times
 
-# Add a new nonce field for any sensors
-# not found in the nonce.
-def setup_times(project,config,nonce):
+
+# initialize sensor and time parameters from
+# configuration and nonce values.  Returns two
+# dicts, both organized by uid.  One containing
+# sensor specifications, and the other containing
+# `init` and `step` times for scraping the sensor.
+def setup_parameters(project,config,nonce):
     settings,sensors = config['settings'],config['sensor']
-    mkuid = get_uid_generator()
-    now = time.time()
-    init = settings.get('init-time',now-86400)
-    step = settings.get('step-time',31536000)
-    mkstop = lambda s: min((s+step,now))
-    start,stop = {},{}
+    mkuid = get_uid_generator() # get a uid generator instance.
+    params = {} # collector for parsed sensor parameters.
+    # iteratively parse each sensor's configuration, generating
+    # its uid and filling in default values as needed.
     for sensor in sensors:
-        node = sensor.get('node',project)
-        unit = sensor.get('unit','undefined')
-        name = sensor['name']
-        code = mkuid((node,name,unit))
-        start[code] = nonce.get(code,init)
-        stop[code] = mkstop(start[code])
-    return start,stop
+        # skip sensors with optional `actv` field set to `false`.
+        if not sensor.get('actv',True): continue
+        # initialize `spec` with allowable defaults.
+        spec = {'node':project,'unit':'undefined'}
+        # populate spec with values from sensor.
+        spec.update(sensor)
+        # compile values for `node`, `name`, and `unit`.
+        identity = (spec[k] for k in ('node','name','unit'))
+        # pass identity to the `uid` generator.
+        snid = mkuid(tuple(identity))
+        # save `spec` to `params` with the sensor's `uid` as its key.
+        params[snid] = spec
+    # use tooling in `data-utils` to generate time specs.
+    # returns a dict of form: `{'uid': {'init': .., 'step': ...},...}`
+    times = make_time_specs(params,settings,nonce)
+    return params,times
+
 
 # Generate a pre-configured query callable
 # s.t. we don't all die of excess boilerplate.

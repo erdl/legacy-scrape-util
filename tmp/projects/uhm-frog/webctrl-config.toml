@@ -202,61 +202,73 @@ node = "frog-1"
 name = "air-handler-avg"
 path = "ABSPATH:1:#powerscout_frog_1b_/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "building-services-avg"
 path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_b_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "ceiling-fans-avg"
 path = "ABSPATH:1:#powerscout_frog_1c_/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "chiller-avg"
 path = "ABSPATH:1:#powerscout_frog_1a/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "exterior-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_a_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "fire-alarm-avg"
 path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_c_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "lutron-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_a_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "service-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_1e/kw_avg_phase_b_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "solar-1-avg"
 path = "ABSPATH:1:#powerscout_frog_1g/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "solar-2-avg"
 path = "ABSPATH:1:#powerscout_frog_1h/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "whole-building-avg"
 path = "ABSPATH:1:#powerscout_frog_1d_/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 name = "window-actuators-avg"
 path = "ABSPATH:1:#powerscout_frog_1f/kw_avg_phase_c_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-1"
 actv = false
@@ -476,61 +488,73 @@ node = "frog-2"
 name = "air-handler-avg"
 path = "ABSPATH:1:#powerscout_frog_2b/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "building-services-it-avg"
 path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_b_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "ceiling-fans-avg"
 path = "ABSPATH:1:#powerscout_frog_2c/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "chiller-avg"
 path = "ABSPATH:1:#powerscout_frog_2a/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "exterior-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_a_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "fire-alarm-avg"
 path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_c_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "lutron-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_a_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "service-lights-avg"
 path = "ABSPATH:1:#powerscout_frog_2e/kw_avg_phase_b_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "solar-1-avg"
 path = "ABSPATH:1:#powerscout_frog_2g/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "solar-2-avg"
 path = "ABSPATH:1:#powerscout_frog_2h/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "whole-building-avg"
 path = "ABSPATH:1:#powerscout_frog_2d/kw_avg_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 name = "window-actuators-avg"
 path = "ABSPATH:1:#powerscout_frog_2f/kw_avg_phase_c_tn"
 unit = "kW"
+init = 1491004800
 [[sensor]]
 node = "frog-2"
 actv = false
