@@ -7,6 +7,7 @@ import time
 
 egauge_error = eu.error_template("`egauge` data-acquisition step")
 
+
 # primary entry point for scrape of egauges.
 # Returns any acquired data & updated nonce.
 def acquire(project,config,state):
@@ -48,6 +49,7 @@ def run_filters(filters,data):
             error = mkerr("unrecognized filter mode: " + str(mode))
             raise Exception(error)
     return rows
+
 
 # initialzie start and stop times for all gauges.
 def setup_times(project,config,state):
