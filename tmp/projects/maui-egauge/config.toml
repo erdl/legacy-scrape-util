@@ -19,7 +19,7 @@ in-order = ["filter","replace"]
 
 [reshape.value.filter]
 generation = false
-timestamp = { dec = 0, tail = "00" }
+timestamp = { dec = 0, tail = "00.0" }
 
 [reshape.value.replace]
 "usage" = 31
