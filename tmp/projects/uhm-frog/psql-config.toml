@@ -1,5 +1,5 @@
 [settings]
-is-active = false
+is-active = true
 database = "frog_uhm"
 table = "reading"
 primary-key = ["datetime","purpose_id"]

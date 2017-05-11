@@ -5,7 +5,6 @@ to-replace = "name"
 in-order = ["generate","filter","replace"]
 
 
-
 [filter]
 # convert all timestamps to ints, and filter
 # out any which are not on the minute mark.
@@ -13,7 +12,6 @@ timestamp = { dec = 0, tail = "00.0" }
 
 frog-1-whole-building-avg-kw = { dec = 2 }
 frog-2-whole-building-avg-kw = { dec = 2 }
-
 
 
 [[generate]]
