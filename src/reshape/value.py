@@ -99,8 +99,16 @@ def limiting_filters(spec,rows,target='value'):
         fltr = lambda v: v >= spec['min']
         keep,rem = du.split_rows(fltr,keep,target=target)
         remove += rem
+    # remove all rows where the value of `target` is not a
+    # multiple of some value.  Called 'mod' because it is
+    # filtering out values which do not have a clean modulus
+    # for the given value... this may need renaming.
+    if 'mod' in spec:
+        fltr = lambda v: int(v) % spec['mod'] == 0
+        keep,rem = du.split_rows(fltr,keep,target=target)
+        remove += rem
     # filter out rows where the value of `target` does not
-    # start with and of the expected characters strings.
+    # start with one of the expected characters strings.
     if 'head' in spec:
         head = spec['head']
         if not isinstance(head,list): head = [head]

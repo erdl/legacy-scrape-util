@@ -3,12 +3,14 @@ is-active = true
 uid-key = ["node","name","unit"]
 to-replace = "name"
 in-order = ["generate","filter","replace"]
+on-replace = "archive"
+on-filter = "archive"
 
 
 [filter]
 # convert all timestamps to ints, and filter
 # out any which are not on the minute mark.
-timestamp = { dec = 0, tail = "00.0" }
+timestamp = { dec = 0, tail = "0.0", mod = 60 }
 
 frog-1-whole-building-avg-kw = { dec = 2 }
 frog-2-whole-building-avg-kw = { dec = 2 }

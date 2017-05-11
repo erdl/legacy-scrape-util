@@ -20,12 +20,14 @@ def get_projects():
     projects = [d for d in dirlist if not '.' in d]
     return projects
 
+
 # load the configuration file for a given project.
 def get_config(project):
     directory = 'tmp/projects/{}/'.format(project)
     core = load_file(directory,'config')
     config = expand(directory,core)
     return config
+
 
 # load existent state files if any.
 def get_state(project):
@@ -43,6 +45,7 @@ def get_state(project):
         state[name] = data
     return state
 
+
 # save all elements of the current state object.
 def save_state(project,state):
     directory = 'tmp/projects/{}/state-files/'.format(project)
@@ -54,6 +57,7 @@ def save_state(project,state):
         fname = '{}.toml'.format(key)
         with open(directory + fname,'w') as fp:
             toml.dump(val,fp)
+
 
 # recursively expand all `-file` fields
 # within some existing dict of data.
@@ -75,6 +79,7 @@ def expand(directory,data):
             collector[key] = exp
     return collector
 
+
 # load a target file.
 def load_file(directory,target):
     files = list_files(directory)
@@ -87,6 +92,7 @@ def load_file(directory,target):
         data = parse(fp)
     return data
 
+
 # load a parser for some file.
 def get_parser(filename,strict=True):
     if filename.endswith('toml'):
@@ -97,17 +103,20 @@ def get_parser(filename,strict=True):
     else: raise Exception('unknown filetype: ' + filename)
     return parse
 
+
 # list all files in a directory.
 def list_files(directory):
     dirlist = os.listdir(directory)
     fltr = lambda f: path.isfile(directory + f)
     return list(filter(fltr,dirlist))
 
+
 # list all directories in a directory.
 def list_dirs(directory):
     dirlist = os.listdir(directory)
     fltr = lambda f: path.isdir(directory + f)
     return list(filter(fltr,dirlist))
+
 
 # return all elements from a list of files
 # which match the specified filetype
@@ -121,12 +130,15 @@ def match_filetype(files,filetype):
             matches.append(name)
     return matches
 
+
 # archiving shortcut for steps which archive rows,
 # e.g.; when removed during value-based filtering.
 def save_archive(project,step,rows):
-    name = str(step) + '-' + str(int(time.time()))
-    path = 'tmp/archive/{}/'.format(project)
-    filepath = path + name + '.csv'
+    fname = str(step) + '-' + str(int(time.time()))
+    fpath = 'tmp/archive/{}/'.format(project)
+    if not path.isdir(fpath):
+        os.makedirs(fpath)
+    filepath = fpath + fname + '.csv'
     save_csv(filepath,rows,append=True)
 
 
