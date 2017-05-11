@@ -1,8 +1,8 @@
 [acquire.static.settings]
 is-active = true
-#source = '/usr/local/smb-share/hobo-12-raw/inputs/'
-#on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
-#on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
+source = '/usr/local/smb-share/hobo-12-raw/inputs/'
+on-fmt = '/usr/local/smb-share/hobo-12-raw/archive/'
+on-err = '/usr/local/smb-share/hobo-12-raw/errors/'
 on-raw = 'tmp/outputs/hobo-u12/raw/' # default: `false`
 
 
@@ -41,12 +41,12 @@ round = 2 # default: 6
 # CSV EXPORT
 [export.csv.settings]
 is-active = true
-#directory = '/usr/local/smb-share/hobo-12-raw/outputs/'
+directory = '/usr/local/smb-share/hobo-12-raw/outputs/'
 file-spec = { tag = 'u12-data', timestamp = true }
 
 # PSQL EXPORT
 [export.psql.settings]
-is-active = false
+is-active = true
 database = "maui"
 table = "reading"
 primary-key = ["datetime","purpose_id"]
