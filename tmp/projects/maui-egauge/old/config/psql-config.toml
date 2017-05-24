@@ -1,8 +1,0 @@
-[general]
-is-active = false
-database = "maui"
-table = "reading"
-
-[conversions]
-datetime = "to-timestamp"
-upload_timestamp = "to-timestamp"
