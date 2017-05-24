@@ -1,4 +1,5 @@
 # Project-Specific
+tmp/projects/
 tmp/outputs/
 tmp/inputs/
 tmp/errors/
