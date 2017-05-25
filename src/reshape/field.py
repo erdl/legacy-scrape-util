@@ -108,7 +108,7 @@ def generate_current_time(project,config,state,rows):
             error = mkerr('unexpected value for `index`: ' + index)
             raise Exception(error)
     elif isinstance(index,int):
-        fmt = lambda v,r: list(r).insert(index,v)
+        fmt = lambda v,r: list((*r[0:index],v,*r[index:]))
     else:
         error = mkerr('unexpected value for `index`: ' + str(index))
         raise Exception(error)

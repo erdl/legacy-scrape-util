@@ -19,7 +19,6 @@ def reshape(project,config,state,data):
     else: order = [a for a in actions if a in config]
     errors = []
     for action in order:
-        scount = len(data)
         substate = state[action] if action in state else {}
         if action == 'filter':
             substate,data = run_filters(project,config,substate,data)
@@ -30,9 +29,6 @@ def reshape(project,config,state,data):
         else: raise Exception('unknown action: ' + action)
         if substate: state[action] = substate
         else: state.pop(action,None)
-        ecount = len(data)
-        diff = scount - ecount
-        if diff: print('{} rows removed during {} step.'.format(diff,action))
     return state,data
 
 # Filter out undesired data-points, either

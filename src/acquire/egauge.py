@@ -17,7 +17,7 @@ def acquire(project,config,state):
     data = []
     fltr = lambda r : r.timestamp
     for gid in gauges:
-        print('querying gauge: {}...'.format(gid))
+        print('querying egauge: {}...'.format(gid))
         raw = query(gauges[gid],starts[gid],stops[gid])
         if not raw: continue
         rows = fmt_query(gid,raw)
@@ -25,7 +25,7 @@ def acquire(project,config,state):
         fltr = lambda r: r.timestamp
         nonce[gid] = max(rows,key=fltr).timestamp
         data += rows
-    print('gauge queries complete...')
+    print('egauge queries complete...\n')
     if 'filter' in config:
         data = run_filters(config['filter'],data)
     state['nonce'] = nonce
@@ -73,6 +73,12 @@ def query(gauge,start,stop):
     uri = 'http://egauge{}.egaug.es/cgi-bin/egauge-show?c&C&m'
     params = {'t': int(start), 'f': int(stop)}
     r = requests.get(uri.format(gauge),params=params)
+    if not r.status_code == 200:
+        print('\n------------- warning -------------')
+        print('  query failed with status code: ',r.status_code)
+        print('  check gauge if this problem persists')
+        print('-----------------------------------\n')
+        return {}
     # break up the recieved csv into two-dimensional list structure.
     rows = [[y for y in x.split(',')] for x in r.text.splitlines()]
     if not rows: return {}
