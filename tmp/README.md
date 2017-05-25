@@ -4,8 +4,7 @@ The `tmp/` directory is the default location for all non-source files.
 The utility will automatically search this directory for project
 specifications, and will save errors, file outputs, and archives
 within this directory by default.  Data-acquisition methods which
-operate on static files also default to taking thein inputs from
-this directory.
+operate on static files also take their inputs from this directory.
 
 
 ## Overview
