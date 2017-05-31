@@ -1,9 +1,0 @@
-# The state file is used by various program components
-# to store information between program runs.  E.G.; if
-# an implementation scrapes sensor data from a server,
-# it may store nonce files here.
-
-
-# This flag indicates that this project has not been
-# run yet, and should run any special initializations.  
-init = true   
