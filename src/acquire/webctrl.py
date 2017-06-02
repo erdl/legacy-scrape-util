@@ -10,6 +10,7 @@ webctrl_error = error_template('`webctrl` data-acquisition step')
 # Primary entry point for webctrl scrape.
 # Returns data & updated state.
 def acquire(project,config,state):
+    settings = config['settings']
     # check that config is valid, parse sensor
     # parameters, and generate time specifications
     # for all active sensors.
@@ -19,13 +20,15 @@ def acquire(project,config,state):
     query = new_query(config['settings'])
     # initialize collectors for formatted
     # data and the new `nonce` values.
-    nonce,data = {},[]
+    nonce,buffs,data = {},{},[]
     # iteratively scrape all sensors.
     for uid,spec in params.items():
         # break out the webctrl-path and identity values from `spec`.
         path,*ident = (spec[k] for k in ('path','node','name','unit'))
-        # pull start-time and maximum step from `times`.
+        # pull start-time and maximum step from `times`. 
         start,step = times[uid]['init'],times[uid]['step']
+        # get the buffer if it exists (default to empty list).
+        buff = times[uid].get('buff',[])
         # query webctrl at `path` from `start` to `start` + `step`.
         result = query(path,start,(start+step))
         # make a generator for the `Row` type based
@@ -38,15 +41,21 @@ def acquire(project,config,state):
         if not rows:
             nonce[uid] = start
             continue
+        # filter out any data points already in buff.
+        for time in buff:
+            fltr = lambda r: r.timestamp != time
+            rows = list(filter(fltr,rows))
         # filter rows by timestamp.
         fltr = lambda r: r.timestamp
-        # set most recent timestamp as the new `nonce` value.
-        nonce[uid] = max(rows,key=fltr).timestamp
+        stamps = [fltr(r) for r in rows] # get all timestamps.
+        nonce[uid] = max(stamps) # set the new nonce value.
+        buffs[uid] = stamps + buff # set the new buff values.
         data += rows # add our rows to `data`.
     # add newly generate `nonce` to `state`, overwriting
     # old value if it exists.
     state['nonce'] = nonce
-    # fin ;)
+    if settings.get('rolling-buffer',False):
+        state = set_buffer(settings,state,buffs)
     return state,data
 
 
@@ -82,7 +91,51 @@ def setup(project,config,state):
     # and add/update any missing missing values.
     nonce = state.get('nonce',{})
     params,times = setup_parameters(project,config,nonce)
+    if config['settings'].get('rolling-buffer',False):
+        times = get_buffer(config['settings'],state,times)
     return params,times
+
+# accepts a dict of time specs in the form:
+# {uid: {init: ..., step: ...}, ...}, adding a
+# 'buff' field to each spec.  The `buff` field
+# consists of a list of timestamps for which data
+# has already been recorded for the given uid.
+# this serves as a sanity-check when dealing with
+# unreliable webctrl instances, as they have been
+# known to serve data with periodic gaps.
+def get_buffer(settings,state,times):
+    # get the previous buffer from state.
+    prev = state.get('buff',{})
+    # load the buffer size.
+    size = settings['rolling-buffer']
+    # if user simply set `rolling-buffer` to true, then
+    # we simply use the default size value.
+    if isinstance(size,bool):
+        size = 604800 # defaults to one-week buffer
+    # iteratively add a `buff` field to all time specs.
+    for uid,spec in times.items():
+        init = spec['init'] - size
+        step = spec['step'] + size
+        buff = [t for t in prev.get(uid,[]) if t >= init]
+        times[uid].update({'init':init,'step':step,'buff':buff})
+    return times
+
+
+# trim down the collected buffer, and attach
+# it to the `state` variable.
+def set_buffer(settings,state,buffs):
+    # get the size of the rolling buffer.
+    size = settings['rolling-buffer']
+    # if user set rolling buffer flag w/ bool,
+    # set size to its default value: one week.
+    if isinstance(size,bool):
+        size = 604800
+    # filter to reduce a buffer to within `size` of its
+    # most recent timestamp.
+    fltr = lambda b: [t for t in b if t >= (max(b)-size)]
+    # set the `buff` section of `state`.
+    state['buff'] = {k: fltr(v) for k,v in buffs.items()}
+    return state
 
 
 # initialize sensor and time parameters from

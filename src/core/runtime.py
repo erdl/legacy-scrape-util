@@ -2,28 +2,27 @@
 from importlib import import_module
 import src.core.file_utils as file_utils
 import src.core.error_utils as error_utils
-import src.core.cli_utils as cli_utils
 
-# primary entry point of runtime; handles
-# launch of various possible execution modes.
-def run():
-    # `cli` mode allows user to interactively list which
-    # projects to run, and/or make a new project template.
-    args = cli_utils.run_cli()
-    projects = args.get('projects',[])
-    if not projects: return
-    mode = args.get('mode','cli')
-    if mode == 'cli':
-        for proj in projects:
-            run_project(proj)
-    # `cron` mode runs all existent projects via
-    # the `run_wrapped` method which causes any
-    # exceptions to be logged to a txt file.
-    elif mode == 'cron':
-        for proj in projects:
-            run_wrapped(proj)
-    else:
-        raise Exception('unrecognized mode: ' + str(mode))
+
+# primary entry point for runtime.
+# accepts two optional args: project-name,
+# and a bool indicated wether or not to run
+# pgrm wrapped in a try/catch with logging.
+def run(proj='all',wrap=False):
+    projects = file_utils.get_projects()
+    torun = projects if proj == 'all' else proj
+    if not isinstance(torun,list): torun = [torun]
+    for project in torun:
+        if not project in projects:
+            err = 'could not find project folder matching: '
+            raise Exception(err + str(project))
+    # alias the appropriate run function as `runit`.
+    runit = lambda p: run_wrapped(p) if wrap else run_project(p)
+    print('running {} projects...\n'.format(len(torun)))
+    # iteratively run all projects.
+    for project in torun:
+        runit(project)
+
 
 # wrapper around `run_project` which catches
 # and logs any errors that arise during the
@@ -35,6 +34,7 @@ def run_wrapped(project):
         print('exception in {}:'.format(project))
         print(str(err) + '\n')
         error_utils.mklog(project,err)
+
 
 # runs a single project, handling all necessary
 # initialization & cleanup.  can be called externally

@@ -93,7 +93,7 @@ def load_file(directory,target):
     return data
 
 
-# load a parser for some file.
+# load a parser for some config file.
 def get_parser(filename,strict=True):
     if filename.endswith('toml'):
         parse = lambda fp: toml.load(fp)

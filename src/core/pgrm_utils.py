@@ -8,3 +8,4 @@ def get_module(modname):
     fmt = lambda m: m.lower().replace('-','_')
     mod = import_module(fmt(modname))
     return mod
+

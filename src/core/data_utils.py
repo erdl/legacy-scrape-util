@@ -209,3 +209,5 @@ def make_time_specs(targets,settings={},nonce={}):
     # pass back the time values.  implementation is responsible
     # for updating the actual nonce after scrape attempt.
     return times
+
+
