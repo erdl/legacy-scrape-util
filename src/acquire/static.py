@@ -32,7 +32,6 @@ def acquire(project,config,state):
     time_now = int(time.time())
     data = [] # collector for successufully generated rows.
     # iteratively run all parsers.
-    print(parsers) # DEBUG
     for spec in parsers:
         name = spec['parser'] # name of perser to use.
         print('running static file parser: {}\n'.format(name))
