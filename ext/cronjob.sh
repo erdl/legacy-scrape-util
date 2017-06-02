@@ -12,6 +12,6 @@ umask 001
 echo -e 'attempting to launch scrape-util...\n'
 
 # attempt to invoke scrape-util
-./scrape-util run
+./scrape-util
 
 echo -e '\ngoodbye!'
