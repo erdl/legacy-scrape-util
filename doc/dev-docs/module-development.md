@@ -37,7 +37,7 @@ def acquire(project,config,state):
 
 ### Arguments
 
-The `project` variabe is a string representing the name of the
+The `project` variable is a string representing the name of the
 current project.  Many data-acquisition modules use this as the default value
 for `node` in rows for which no `node` value is defined.  The `config` and `state`
 variables are both dictionaries.  The `config` dict contains all user-supplied

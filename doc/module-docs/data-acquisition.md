@@ -16,7 +16,7 @@ The `egauge` acquisition module is used for acquiring data via the
 The `[gauges]` section is the only required configuration section for
 the `egauge` module.  It should consist of a set of key-value pairs
 corresponding of some arbitrary name and the target gauge number
-respectiveyl. *Ex:*
+respectively. *Ex:*
 
 ```toml
 [gauges]
@@ -64,14 +64,37 @@ name = "outdoor-lights"
 ```
 
 Additionally, match strings may start and/or end with the the wildcard character 
-(`'*'`) in order to match more than one possible permutations.  *Ex:* `"*foo"`
-matches any value that ends with `foo`, `"foo*"` matches any value that begins
-with `foo`, and `"*foo*"` matches any value which contains `foo`.
-
+(`'*'`) in order to match more than one possible permutations.  *Ex:* `"foo*"` matches
+any value that *begins* with `foo`, while `"*foo"` matches any value that *ends* with `foo`,
+and `"*foo*"` matches any value which contains `foo`.
 
 
 ## Webctrl
 
+TODO
+
 
 ## Static
 
+The `static` data-acquisition module is slightly unique in that it actually contains
+a series of sub modules (referred to as parsers), which can be individually called.
+The `static` module provides a set of common features and behaviors when the 
+source of data-acquisition is a static file which already exists on the local machine.
+
+### `[settings]`
+
+The `[settings]` section is optional, and contains a set of configuration values
+which describe the default directories for various file actions.  Lets take a look
+at the settings section from a project that is parsing `hobo-u12` data as part of
+an energy usage audit:
+
+```toml
+[settings]
+source = "tmp/inputs/energy-audit-u12/"
+on-fmt = "tmp/archive/energy-audit-u12/"
+on-err = "tmp/errors/energy-audit-u12/"
+on-raw = false
+```
+
+
+ 
