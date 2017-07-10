@@ -15,12 +15,13 @@ def parse(project,config,state,filepath):
 # reformat the data into `Row` objects.
 def reformat_data(config,raw):
     if not raw: return
-    fields = ['survey','question','option','timestamp']
+    for r in raw: print(len(r))
+    fields = ['url','survey','question','option','timestamp']
     if raw[0] == fields:
         raw = raw[1:]
         if not raw: return
     toint = lambda r: [elem for elem in map(int,r)]
-    torow = lambda r: Row(r[0],r[1],"n/a",r[2],r[3])
+    torow = lambda r: Row(r[0],r[1],r[2],r[4],r[3])
     mkrow = lambda r: torow(toint(r))
     rows = [mkrow(r) for r in raw]
     return rows
@@ -29,5 +30,5 @@ def reformat_data(config,raw):
 def read_csv(filename):
     with open(filename) as fp:
         reader = csv.reader(fp)
-        rows = [r for r in reader]
+        rows = [r for r in reader if r]
     return rows
