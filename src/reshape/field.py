@@ -88,10 +88,40 @@ def run_generators(project,config,state,data):
         value = gen['value']
         if value == 'current-time':
             state,rows = generate_current_time(project,gen,state,rows)
+        if value == 'literal':
+            state,rows = generate_literal(project,gen,state,rows)
         else:
             error = mkerr('unrecognized `value` argument: ' + value)
             raise Exception(error)
     return state,rows
+
+# add a field with some arbitrary value for all rows.
+def generate_literal(project,config,state,rows):
+    if not rows: return
+    mkerr = field_error('generating field: `literal`')
+    title = config['title']
+    index = config.get('index','append')
+    value = config['ident']
+    if isinstance(index,str):
+        if index == "append":
+            fmt = lambda v,r: list(r) + [v]
+        else:
+            error = mkerr('unexpected value for `index`: ' + index)
+            raise Exception(error)
+    elif isinstance(index,int):
+        fmt = lambda v,r: list((*r[0:index],v,*r[index:]))
+    else:
+        error = mkerr('unexpected value for `index`: ' + str(index))
+        raise Exception(error)
+    fields = rows[0]._fields
+    newfields = fmt(title,fields)
+    mkrow = du.custom_row_generator(newfields)
+    modify = lambda r: mkrow(fmt(value,r))
+    newrows = []
+    for row in rows:
+        newrow = modify(row)
+        newrows.append(newrow)
+    return state,newrows
 
 # add a generated field containing the current time.
 def generate_current_time(project,config,state,rows):
@@ -121,3 +151,4 @@ def generate_current_time(project,config,state,rows):
         newrow = modify(row)
         newrows.append(newrow)
     return state,newrows
+

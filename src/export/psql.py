@@ -20,7 +20,7 @@ def export(project,config,state,data):
         ins = custom_insertion(fields,config['conversions'])
     # default is just standard psycopg2 formatting...
     else: ins = ','.join(['%s'] * len(fields))
-    cmd = 'INSERT INTO {} VALUES ({})'.format(tbl,ins)
+    cmd = 'INSERT INTO {} VALUES ({}) ON CONFLICT DO NOTHING'.format(tbl,ins)
     print('pushing {} rows to psql...'.format(len(data)))
     errors,errtxt,dups = handle_push(data,cmd,db)
     duplicates += dups
@@ -90,8 +90,11 @@ def custom_insertion(fields,insmap):
     # collection of all possible insertion strings.
     inserts = {
         'default' : '%s',
-        'to-timestamp' : 'to_timestamp(%s)'
+        'to-timestamp' : 'to_timestamp(%s)',
     }
+    if 'psql-defaults' in insmap:
+        psql_defaults = insmap.pop('psql-defaults')
+    else: psql_defaults = []
     for i in insmap:
         if i not in fields:
             raise Exception('unrecognized data field: {}'.format(i))
@@ -103,6 +106,9 @@ def custom_insertion(fields,insmap):
         if f in insmap:
             ins.append(inserts[insmap[f]])
         else: ins.append(inserts['default'])
+    if psql_defaults:
+        for idx in psql_defaults:
+            ins.insert(int(idx),'DEFAULT')
     return ','.join(ins)
 
 
