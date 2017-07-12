@@ -88,7 +88,7 @@ def run_generators(project,config,state,data):
         value = gen['value']
         if value == 'current-time':
             state,rows = generate_current_time(project,gen,state,rows)
-        if value == 'literal':
+        elif value == 'literal':
             state,rows = generate_literal(project,gen,state,rows)
         else:
             error = mkerr('unrecognized `value` argument: ' + value)
